@@ -1,0 +1,34 @@
+# PROJECT BIBLE v2 — SKILL
+
+## DESCRIZIONE
+Skill per creare il documento di progetto completo e strutturato partendo dal materiale grezzo.
+
+## OBIETTIVO
+Trasformare il materiale fornito dall'account manager in un brief operativo chiaro, dettagliato e utilizzabile.
+
+## QUANDO USARLA
+- Appena ricevuto il file TXT dall'account manager
+- Prima di iniziare qualsiasi lavoro sul sito
+- Come riferimento durante tutto il progetto
+
+## PROCESSO
+1. Leggi e analizza tutto il materiale ricevuto
+2. Identifica obiettivo principale del sito
+3. Definisci il target audience
+4. Mappa la struttura del sito (pagine e gerarchia)
+5. Assegna keyword primarie e secondarie per ogni pagina
+6. Documenta brand identity (colori, font, tono)
+7. Raccogli referenze visive e competitor
+8. Definisci la timeline stimata
+
+## OUTPUT ATTESO
+- Struttura sito completa con gerarchia pagine
+- Keyword map per ogni pagina
+- Brand guidelines sintetiche
+- Lista materiali disponibili e mancanti
+- Timeline progetto
+- Note operative per lo sviluppo
+
+## NOTE
+Il Project Bible è il documento di riferimento centrale.
+Aggiornalo durante tutto il progetto se cambiano le specifiche.

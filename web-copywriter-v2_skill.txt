@@ -1,0 +1,31 @@
+# WEB COPYWRITER v2 — SKILL
+
+## DESCRIZIONE
+Skill avanzata per la creazione di copy web professionale ad alto impatto.
+
+## OBIETTIVO
+Creare testi per siti web che convertono, rispettando il tono del brand e ottimizzando per SEO.
+
+## QUANDO USARLA
+- Dopo aver definito la struttura del sito (brief pronto)
+- Quando il layout e le sezioni sono già impostate
+- Per ogni pagina e sezione del sito
+
+## PROCESSO
+1. Analizza il brief del cliente e il tone of voice
+2. Identifica le keyword target per ogni pagina
+3. Struttura il copy per sezione (headline → body → CTA)
+4. Scrivi in modo conversazionale e persuasivo
+5. Ottimizza per SEO senza sacrificare la leggibilità
+6. Revisiona per coerenza e correttezza
+
+## OUTPUT ATTESO
+- Headline principale di ogni pagina
+- Sottotitoli di sezione
+- Body copy per ogni blocco
+- CTA chiari e orientati alla conversione
+- Meta title e meta description
+
+## NOTE
+Adatta sempre il registro al settore del cliente.
+Evita il gergo tecnico se il target è generalista.
