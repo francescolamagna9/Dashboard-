@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--dark:#0f0e17;--card:#1a1828;--card2:#221f35;--accent:#7c6af7;--accent2:#f7a26c;--accent3:#6affc4;--text:#e8e4ff;--muted:#7b77a0;--border:#2d2a45;--danger:#f76a6a}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(124,106,247,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(106,255,196,.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+.header{position:sticky;top:0;z-index:100;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(15,14,23,.92);backdrop-filter:blur(14px)}
+.logo{display:flex;align-items:center;gap:11px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#7c6af7,#6affc4);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 0 16px rgba(124,106,247,.4);flex-shrink:0}
+.logo-text h1{font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--text);line-height:1.2}
+.logo-text p{font-size:10px;color:var(--muted);margin-top:1px}
+.badge{background:rgba(124,106,247,.12);border:1px solid rgba(124,106,247,.3);color:#a99fff;border-radius:20px;padding:4px 11px;font-size:11px;font-weight:600;white-space:nowrap}
+
+.tabs{position:relative;z-index:10;padding:14px 20px 0;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:none;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0}
+.tab:hover{border-color:var(--accent);color:var(--text)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(124,106,247,.35)}
+.tab-count{background:rgba(255,255,255,.18);border-radius:9px;padding:1px 6px;font-size:10px}
+
+.main{position:relative;z-index:10;padding:18px 20px}
+
+.top-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.search-bar{flex:1;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.search-bar:focus{border-color:var(--accent)}
+.search-bar::placeholder{color:var(--muted)}
+.add-btn{background:linear-gradient(135deg,#7c6af7,#6affc4);color:#0f0e17;border:none;border-radius:10px;padding:9px 15px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:opacity .2s;flex-shrink:0}
+.add-btn:hover{opacity:.88}
+
+.skills-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.skills-list{display:flex;flex-direction:column;gap:10px}
+
+.skill-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:17px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.skill-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.skill-card.selected{border-color:var(--accent);background:var(--card2);box-shadow:0 0 0 3px rgba(124,106,247,.14),0 8px 24px rgba(0,0,0,.28)}
+.skill-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+.cat-badge{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:20px;padding:3px 8px;white-space:nowrap}
+.cat-copy{background:rgba(247,162,108,.12);color:#f7a26c;border:1px solid rgba(247,162,108,.28)}
+.cat-pm{background:rgba(106,255,196,.1);color:#6affc4;border:1px solid rgba(106,255,196,.22)}
+.cat-dev{background:rgba(124,106,247,.12);color:#a99fff;border:1px solid rgba(124,106,247,.28)}
+.cat-design{background:rgba(247,106,162,.1);color:#f76aa6;border:1px solid rgba(247,106,162,.22)}
+.cat-seo{background:rgba(247,220,106,.1);color:#f7dc6a;border:1px solid rgba(247,220,106,.22)}
+.cat-html{background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.25)}
+.cat-other{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
+.skill-ver{font-size:10px;color:var(--muted);flex-shrink:0}
+.skill-name{font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:var(--text);margin-bottom:5px;padding-right:44px}
+.skill-desc{font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:9px}
+.skill-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:11px}
+.tag{background:rgba(124,106,247,.1);color:#a99fff;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:500}
+.skill-footer{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.skill-date{font-size:10px;color:var(--muted)}
+.skill-actions{display:flex;gap:5px}
+.dl-btn{background:rgba(124,106,247,.14);color:#a99fff;border:1px solid rgba(124,106,247,.28);border-radius:7px;padding:5px 9px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.dl-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.del-btn{background:rgba(247,106,106,.08);color:#f76a6a;border:1px solid rgba(247,106,106,.2);border-radius:7px;padding:5px 7px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.del-btn:hover{background:var(--danger);color:#fff}
+.file-type-badge{position:absolute;top:11px;right:11px;font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:2px 6px;color:var(--muted)}
+
+.detail-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;position:sticky;top:72px}
+.detail-empty{text-align:center;padding:36px 14px;border:1px dashed var(--border);border-radius:12px}
+.detail-empty .emoji{font-size:30px;margin-bottom:8px}
+.detail-empty p{font-size:12px;color:var(--muted)}
+.detail-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px}
+.detail-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:800}
+.close-btn{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:3px;flex-shrink:0;transition:color .2s}
+.close-btn:hover{color:var(--text)}
+.code-block{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:9px;padding:11px;max-height:240px;overflow-y:auto;margin-bottom:11px}
+.code-block pre{font-family:'Courier New',monospace;font-size:10.5px;color:#a99fff;white-space:pre-wrap;line-height:1.65}
+.binary-preview{text-align:center;padding:24px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:9px;margin-bottom:11px}
+.binary-preview .file-icon{font-size:36px;margin-bottom:6px}
+.binary-preview p{font-size:12px;color:var(--muted)}
+.binary-preview .file-size{font-size:10px;color:var(--muted);margin-top:3px}
+.dl-btn-full{width:100%;background:linear-gradient(135deg,#7c6af7,#6affc4);color:#0f0e17;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.02em;transition:opacity .2s}
+.dl-btn-full:hover{opacity:.88}
+/* HTML preview */
+.preview-toggle{display:flex;gap:4px;margin-bottom:10px;background:rgba(0,0,0,.3);border-radius:9px;padding:3px}
+.ptog-btn{flex:1;background:none;border:none;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--muted);transition:all .2s}
+.ptog-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(124,106,247,.3)}
+.html-iframe{width:100%;height:320px;border:1px solid var(--border);border-radius:9px;background:#fff;margin-bottom:11px;display:block}
+.html-iframe-wrap{position:relative;margin-bottom:11px}
+.iframe-overlay-msg{position:absolute;bottom:8px;right:8px;background:rgba(15,14,23,.85);border:1px solid var(--border);border-radius:7px;padding:4px 9px;font-size:10px;color:var(--muted);pointer-events:none}
+.empty-state{text-align:center;padding:44px 16px;color:var(--muted)}
+.empty-state div{font-size:32px;margin-bottom:10px}
+/* ── GITHUB SYNC ── */
+.sync-bar{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sync-status{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .2s;border:1px solid transparent;white-space:nowrap}
+.sync-status.disconnected{background:rgba(247,106,106,.08);color:#f76a6a;border-color:rgba(247,106,106,.2)}
+.sync-status.connected{background:rgba(106,255,196,.08);color:#6affc4;border-color:rgba(106,255,196,.2)}
+.sync-status.syncing{background:rgba(124,106,247,.1);color:#a99fff;border-color:rgba(124,106,247,.25)}
+.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sync-dot.red{background:#f76a6a}
+.sync-dot.green{background:#6affc4;box-shadow:0 0 6px #6affc4}
+.sync-dot.pulse{background:#a99fff;animation:pulse-dot .9s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* token modal */
+.token-modal{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;width:100%;max-width:420px;transform:translateY(18px);transition:transform .22s}
+.modal-overlay.open .token-modal{transform:translateY(0)}
+.token-info{background:rgba(247,162,108,.06);border:1px solid rgba(247,162,108,.2);border-radius:10px;padding:12px;font-size:11px;color:#f7a26c;line-height:1.6;margin-bottom:14px}
+.token-field{position:relative}
+.token-field input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 36px 9px 11px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;letter-spacing:.04em}
+.token-field input:focus{border-color:var(--accent)}
+.token-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px}
+.gh-connect-btn{width:100%;background:linear-gradient(135deg,#24292e,#444d56);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:12px;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.gh-connect-btn:hover{opacity:.88}
+.gh-disconnect-btn{width:100%;background:rgba(247,106,106,.08);color:#f76a6a;border:1px solid rgba(247,106,106,.2);border-radius:10px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;transition:all .2s}
+.gh-disconnect-btn:hover{background:var(--danger);color:#fff}
+.gh-user-row{display:flex;align-items:center;gap:10px;background:rgba(106,255,196,.06);border:1px solid rgba(106,255,196,.2);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.gh-avatar{width:32px;height:32px;border-radius:50%;border:2px solid rgba(106,255,196,.3)}
+.gh-uname{font-size:13px;font-weight:700;color:var(--accent3)}
+.gh-repo{font-size:10px;color:var(--muted)}
+.sync-actions{display:flex;gap:8px;margin-top:12px}
+.sync-pull-btn,.sync-push-btn{flex:1;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.sync-pull-btn{background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.25)}
+.sync-pull-btn:hover{background:#38bdf8;color:#0f0e17}
+.sync-push-btn{background:rgba(106,255,196,.1);color:#6affc4;border:1px solid rgba(106,255,196,.25)}
+.sync-push-btn:hover{background:#6affc4;color:#0f0e17}
+.sync-log{font-size:10px;color:var(--muted);margin-top:8px;text-align:center;min-height:16px}
+
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:opacity .22s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;transform:translateY(18px);transition:transform .22s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-header h2{font-family:'Sora',sans-serif;font-size:16px;font-weight:800}
+.modal-body{display:flex;flex-direction:column;gap:13px}
+.field label{display:block;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:8px 11px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field select{cursor:pointer}
+.field select option{background:var(--card2)}
+.field textarea{resize:vertical;min-height:75px;line-height:1.55}
+.tags-input-wrap{display:flex;gap:5px}
+.tags-input-wrap input{flex:1}
+.tags-input-wrap button{background:rgba(124,106,247,.14);color:#a99fff;border:1px solid rgba(124,106,247,.28);border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s}
+.tags-input-wrap button:hover{background:var(--accent);color:#fff}
+.tags-preview{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.tag-pill{background:rgba(124,106,247,.1);color:#a99fff;border-radius:6px;padding:2px 7px;font-size:11px;display:flex;align-items:center;gap:3px}
+.tag-pill button{background:none;border:none;color:#a99fff;cursor:pointer;font-size:13px;padding:0;line-height:1}
+.drop-zone{border:2px dashed var(--border);border-radius:11px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(0,0,0,.18)}
+.drop-zone:hover,.drop-zone.dragging{border-color:var(--accent);background:rgba(124,106,247,.05)}
+.drop-zone .dz-icon{font-size:26px;margin-bottom:6px}
+.drop-zone p{font-size:12px;color:var(--muted);line-height:1.55}
+.drop-zone .dz-types{font-size:10px;color:var(--muted);margin-top:3px;opacity:.65}
+.drop-zone.has-file{border-color:var(--accent3);background:rgba(106,255,196,.04)}
+.drop-zone.has-file p{color:var(--accent3)}
+.modal-footer{display:flex;gap:7px;margin-top:18px}
+.btn-cancel{flex:1;background:none;border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-cancel:hover{border-color:var(--muted);color:var(--text)}
+.btn-save{flex:2;background:linear-gradient(135deg,#7c6af7,#6affc4);color:#0f0e17;border:none;border-radius:9px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.btn-save:hover{opacity:.88}
+.btn-save:disabled{opacity:.4;cursor:not-allowed}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:9px 18px;font-size:12px;font-weight:600;z-index:2000;transition:all .3s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--accent3);color:var(--accent3)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+
+/* ROADMAP */
+.roadmap-header{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:11px}
+.roadmap-header h2{font-family:'Sora',sans-serif;font-size:14px;font-weight:800}
+.roadmap-header p{font-size:10px;color:var(--muted);margin-top:2px}
+.roadmap-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.roadmap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.step-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;cursor:pointer;transition:all .2s}
+.step-card:hover{transform:translateY(-2px)}
+.step-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.step-emoji{font-size:17px;background:var(--card2);border-radius:7px;padding:3px 6px;flex-shrink:0}
+.step-phase{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--muted)}
+.step-title{font-family:'Sora',sans-serif;font-size:12px;font-weight:800}
+.step-desc{font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:5px}
+.step-owner{font-size:9px;color:var(--muted);font-weight:600}
+.detail-step{background:var(--card);border-radius:13px;padding:18px;border:1px solid var(--border)}
+.ds-header{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.ds-emoji{font-size:24px}
+.ds-phase{font-size:10px;font-weight:700;letter-spacing:.1em}
+.ds-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:800}
+.ds-desc{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.ds-section h4{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.deliverable{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text);margin-bottom:4px}
+.deliverable .arrow{font-weight:700}
+.tools-list{display:flex;gap:5px;flex-wrap:wrap}
+.tool-badge{border-radius:7px;padding:3px 9px;font-size:10px;font-weight:600}
+.pipeline{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px 16px}
+.pipeline h4{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px}
+.pipeline-track{display:flex;align-items:center}
+.pip-node{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;border:2px solid;transition:all .2s;flex-shrink:0;background:var(--card2)}
+.pip-node:hover{transform:scale(1.12)}
+.pip-line{flex:1;height:2px}
+.pipeline-labels{display:flex;justify-content:space-between;margin-top:4px}
+.pipeline-labels span{font-size:9px;color:var(--muted)}
+
+/* inline detail that appears under a card on mobile */
+.inline-detail{display:none;margin-top:8px;animation:fadeIn .25s ease forwards}
+.inline-detail.open{display:block}
+
+.section-hidden{display:none}
+.section-visible{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeIn .28s ease forwards}
+
+/* ── PROGETTO ── */
+.project-setup{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px;text-align:center;padding:32px 20px}
+.project-setup .ps-icon{font-size:44px;margin-bottom:16px}
+.project-setup h2{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px}
+.project-setup p{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6}
+.project-name-row{display:flex;gap:8px;width:100%;max-width:440px;margin-bottom:12px}
+.project-name-row input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.project-name-row input:focus{border-color:var(--accent)}
+.project-name-row input::placeholder{color:var(--muted)}
+.project-type-row{display:flex;gap:8px;width:100%;max-width:440px;margin-bottom:18px}
+.type-btn{flex:1;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:12px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--muted);transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:5px}
+.type-btn .tb-icon{font-size:22px}
+.type-btn:hover{border-color:var(--accent);color:var(--text)}
+.type-btn.selected{border-color:var(--accent);background:rgba(124,106,247,.1);color:var(--text);box-shadow:0 0 0 3px rgba(124,106,247,.12)}
+.start-btn{background:linear-gradient(135deg,#7c6af7,#6affc4);color:#0f0e17;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:opacity .2s}
+.start-btn:hover{opacity:.88}
+.start-btn:disabled{opacity:.35;cursor:not-allowed}
+.project-active{display:flex;flex-direction:column;gap:14px}
+.global-progress-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.gp-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.gp-info{flex:1;min-width:0}
+.gp-name{font-family:'Sora',sans-serif;font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gp-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.gp-type-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:20px;padding:2px 8px;margin-top:4px}
+.gp-fraction{font-size:22px;font-weight:800;font-family:'Sora',sans-serif;color:var(--accent3);flex-shrink:0}
+.gp-fraction span{font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:600}
+.gp-bar-wrap{background:rgba(255,255,255,.06);border-radius:99px;height:10px;overflow:hidden;margin:8px 0 4px}
+.gp-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#7c6af7,#6affc4);transition:width .6s cubic-bezier(.4,0,.2,1)}
+.gp-pct{font-size:10px;color:var(--muted);text-align:right}
+.reset-btn{background:rgba(247,106,106,.08);color:#f76a6a;border:1px solid rgba(247,106,106,.2);border-radius:8px;padding:6px 11px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;flex-shrink:0;display:flex;align-items:center;gap:4px}
+.reset-btn:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+/* accordion categories */
+.acc-cat{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.acc-cat.has-done{border-color:rgba(124,106,247,.2)}
+.acc-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s}
+.acc-head:hover{background:rgba(255,255,255,.02)}
+.acc-icon{font-size:20px;flex-shrink:0}
+.acc-info{flex:1;min-width:0}
+.acc-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:800}
+.acc-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.acc-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.acc-frac{font-size:11px;font-weight:700;color:var(--muted)}
+.acc-frac.complete{color:var(--accent3)}
+.acc-chevron{font-size:12px;color:var(--muted);transition:transform .25s}
+.acc-cat.open .acc-chevron{transform:rotate(180deg)}
+.acc-bar-wrap{height:3px;background:rgba(255,255,255,.05);overflow:hidden}
+.acc-bar{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.acc-body{display:none;padding:0 14px 14px}
+.acc-cat.open .acc-body{display:block}
+/* checklist items */
+.cl-list{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02);border:1px solid transparent;-webkit-tap-highlight-color:transparent}
+.cl-item:hover{background:rgba(124,106,247,.06);border-color:rgba(124,106,247,.15)}
+.cl-item.done{background:rgba(106,255,196,.04);border-color:rgba(106,255,196,.12)}
+.cl-item.done .cl-text{text-decoration:line-through;color:var(--muted)}
+.cl-box{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px;transition:all .22s}
+.cl-item.done .cl-box{background:var(--accent3);border-color:var(--accent3);color:#0f0e17;box-shadow:0 0 8px rgba(106,255,196,.3)}
+.cl-text{font-size:12px;line-height:1.55;color:var(--text);flex:1}
+.cl-date{font-size:9px;color:var(--accent3);font-weight:600;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.all-done-banner{background:linear-gradient(135deg,rgba(124,106,247,.15),rgba(106,255,196,.1));border:1px solid rgba(106,255,196,.3);border-radius:14px;padding:24px;text-align:center}
+.all-done-banner .adb-icon{font-size:40px;margin-bottom:10px}
+.all-done-banner h3{font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:var(--accent3);margin-bottom:6px}
+.all-done-banner p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:760px){
+  .skills-layout{grid-template-columns:1fr}
+  .detail-panel{position:relative;top:0}
+  /* roadmap: pipeline top, cards full-width column, detail inline */
+  .roadmap-layout{display:block}
+  .pipeline-top{display:block !important;margin-bottom:14px}
+  .roadmap-grid{grid-template-columns:1fr}
+  #roadmap-detail{display:none !important} /* hidden on mobile, detail is inline */
+}
+@media(max-width:500px){
+  .logo-text p{display:none}
+  .badge{padding:4px 9px;font-size:10px}
+  .add-btn .add-label{display:none}
+  .header{padding:11px 14px}
+  .tabs{padding:11px 14px 0}
+  .main{padding:14px}
+  .top-bar{gap:7px}
+}
+/* on desktop pipeline-top is hidden (pipeline lives inside roadmap-detail col) */
+.pipeline-top{display:none}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">
+      <h1>Skill Dashboard</h1>
+      <p>Il tuo centro operativo personale</p>
+    </div>
+  </div>
+  <div class="sync-bar">
+    <div class="sync-status disconnected" id="sync-status" onclick="openTokenModal()" title="Connetti GitHub">
+      <span class="sync-dot red" id="sync-dot"></span>
+      <span id="sync-label">GitHub</span>
+    </div>
+    <div class="badge" id="header-badge">0 Skill</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('skills',this)">🗂 Le Mie Skill <span class="tab-count" id="tc-skills">0</span></button>
+  <button class="tab" onclick="showTab('roadmap',this)">🗺 Roadmap <span class="tab-count">6</span></button>
+  <button class="tab" onclick="showTab('project',this)" id="tab-project">📋 Progetto Attivo</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- SKILLS -->
+  <div id="section-skills" class="section-visible animate-in">
+    <div class="top-bar">
+      <input type="text" class="search-bar" placeholder="🔍  Cerca skill..." oninput="filterSkills(this.value)" id="search">
+      <button class="add-btn" onclick="openModal()">
+        <span>＋</span><span class="add-label">Aggiungi Skill</span>
+      </button>
+    </div>
+    <div class="skills-layout">
+      <div class="skills-list" id="skills-list"></div>
+      <div id="skill-detail"></div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div id="section-roadmap" class="section-hidden">
+    <div class="roadmap-header">
+      <span style="font-size:24px">🗺</span>
+      <div>
+        <h2>Processo Operativo — Web Project</h2>
+        <p>Dal brief alla consegna: le 6 fasi del tuo workflow professionale</p>
+      </div>
+    </div>
+    <!-- pipeline-top: visibile solo su mobile, sopra le card -->
+    <div class="pipeline-top" id="pipeline-top">
+      <div class="pipeline">
+        <h4>⚡ Pipeline Completa</h4>
+        <div class="pipeline-track" id="pipeline-track-top"></div>
+        <div class="pipeline-labels"><span>Inizio</span><span>Consegna</span></div>
+      </div>
+    </div>
+    <div class="roadmap-layout">
+      <div class="roadmap-grid" id="roadmap-grid"></div>
+      <div id="roadmap-detail"></div>
+    </div>
+  </div>
+
+  <!-- PROGETTO -->
+  <div id="section-project" class="section-hidden">
+    <div id="project-content"></div>
+  </div>
+</div>
+
+<!-- MODAL ADD SKILL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>➕ Aggiungi Skill</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Nome Skill *</label>
+        <input type="text" id="f-name" placeholder="es. SEO Audit v1">
+      </div>
+      <div class="field">
+        <label>Descrizione</label>
+        <input type="text" id="f-desc" placeholder="Breve descrizione dello scopo">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field">
+          <label>Categoria</label>
+          <select id="f-cat">
+            <option>Copywriting</option>
+            <option>Project Management</option>
+            <option>Development</option>
+            <option>Design</option>
+            <option>SEO</option>
+            <option>HTML / Template</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Versione</label>
+          <input type="text" id="f-ver" placeholder="v1.0" value="v1.0">
+        </div>
+      </div>
+      <div class="field">
+        <label>Tag</label>
+        <div class="tags-input-wrap">
+          <input type="text" id="f-tag-input" placeholder="es. SEO" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}">
+          <button onclick="addTag()">+ Tag</button>
+        </div>
+        <div class="tags-preview" id="tags-preview"></div>
+      </div>
+      <div class="field">
+        <label>Carica File <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;font-size:9px">(txt, md, zip, pdf, json, html, qualsiasi formato)</span></label>
+        <div class="drop-zone" id="drop-zone"
+          ondragover="event.preventDefault();this.classList.add('dragging')"
+          ondragleave="this.classList.remove('dragging')"
+          ondrop="handleDrop(event)"
+          onclick="document.getElementById('file-input').click()">
+          <div class="dz-icon">📂</div>
+          <p id="dz-text">Trascina qui il file o clicca per selezionarlo</p>
+          <div class="dz-types">.html (anteprima live) • .txt .md .zip .pdf .json .css .js e altri</div>
+        </div>
+        <input type="file" id="file-input" style="display:none" onchange="handleFileInput(this)" accept="*/*">
+      </div>
+      <div class="field">
+        <label>Oppure scrivi il contenuto direttamente</label>
+        <textarea id="f-content" placeholder="Incolla o scrivi qui il contenuto della skill..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Annulla</button>
+      <button class="btn-save" onclick="saveSkill()">💾 Salva Skill</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STORAGE ──────────────────────────────────────────────────────────────────
+const SK = 'skill_db_v4';
+function loadDB(){
+  try{
+    const r=localStorage.getItem(SK);
+    if(!r)return null;
+    const skills=JSON.parse(r);
+    // ── MIGRATION: convert HTML files saved as binary back to text ──
+    let changed=false;
+    skills.forEach(s=>{
+      const ext=(s.filename||'').split('.').pop().toLowerCase();
+      if((ext==='html'||ext==='htm')&&!s.isText&&s.data){
+        try{
+          // decode base64 back to text
+          const decoded=decodeURIComponent(escape(atob(s.data)));
+          s.isText=true;
+          s.content=decoded;
+          delete s.data;
+          changed=true;
+        }catch(e){
+          // fallback: try without escape (pure ASCII)
+          try{
+            s.isText=true;
+            s.content=atob(s.data);
+            delete s.data;
+            changed=true;
+          }catch(e2){}
+        }
+      }
+    });
+    if(changed){try{localStorage.setItem(SK,JSON.stringify(skills))}catch(e){}}
+    return skills;
+  }catch(e){return null}
+}
+// saveDB defined in GitHub sync section
+
+// ── DEFAULTS ─────────────────────────────────────────────────────────────────
+const DEFAULTS=[
+  {id:1,name:"Web Copywriter v2",filename:"web-copywriter-v2_skill.txt",category:"Copywriting",
+   description:"Skill per la creazione di copy professionale per siti web, ottimizzato per conversioni e SEO.",
+   tags:["Copy","SEO","Web"],date:"10/03/2025",version:"v2.0",isText:true,
+   content:`# WEB COPYWRITER v2 — SKILL
+
+## DESCRIZIONE
+Skill avanzata per la creazione di copy web professionale.
+
+## OBIETTIVO
+Creare testi che convertono, rispettando il tono del brand e ottimizzando per SEO.
+
+## QUANDO USARLA
+- Dopo aver definito la struttura del sito
+- Quando il layout e le sezioni sono già impostate
+
+## PROCESSO
+1. Analizza il brief e il tone of voice
+2. Identifica le keyword target
+3. Struttura headline → body → CTA
+4. Scrivi in modo persuasivo
+5. Ottimizza per SEO
+6. Revisiona per coerenza
+
+## OUTPUT ATTESO
+- Headline principale
+- Sottotitoli sezione
+- Body copy
+- CTA orientati alla conversione
+- Meta title e description`},
+  {id:2,name:"Project Bible v2",filename:"project-bible-v2_skill.txt",category:"Project Management",
+   description:"Skill per la strutturazione del brief e della documentazione di progetto per siti web.",
+   tags:["Brief","Documentazione","Struttura"],date:"12/03/2025",version:"v2.0",isText:true,
+   content:`# PROJECT BIBLE v2 — SKILL
+
+## DESCRIZIONE
+Skill per creare il documento di progetto completo partendo dal materiale grezzo.
+
+## OBIETTIVO
+Trasformare il materiale dell'account manager in un brief operativo chiaro.
+
+## QUANDO USARLA
+- Appena ricevuto il file TXT
+- Prima di iniziare qualsiasi lavoro sul sito
+
+## PROCESSO
+1. Analizza tutto il materiale
+2. Identifica obiettivo principale
+3. Definisci target audience
+4. Mappa la struttura sito
+5. Assegna keyword per pagina
+6. Documenta brand identity
+7. Raccogli referenze e competitor
+8. Definisci timeline
+
+## OUTPUT ATTESO
+- Struttura sito con gerarchia
+- Keyword map
+- Brand guidelines
+- Lista materiali
+- Timeline`}
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let SKILLS=loadDB()||JSON.parse(JSON.stringify(DEFAULTS));
+let selSkill=null, selStep=null, modalTags=[], pendingFile=null;
+let nextId=Math.max(0,...SKILLS.map(s=>s.id))+1;
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function esc(s){
+  if(!s)return'';
+  return String(s)
+    .split('&').join('&amp;')
+    .split('<').join('&lt;')
+    .split('>').join('&gt;')
+    .split('"').join('&quot;')
+}
+function catCls(c){return{Copywriting:'cat-copy','Project Management':'cat-pm',Development:'cat-dev',Design:'cat-design',SEO:'cat-seo','HTML / Template':'cat-html'}[c]||'cat-other'}
+function fileIcon(n,t){if(!n)return'📄';const e=(n.split('.').pop()||'').toLowerCase(),m={zip:'🗜️',pdf:'📕',md:'📝',txt:'📄',json:'📋',html:'🌐',css:'🎨',js:'⚙️',ts:'⚙️',png:'🖼️',jpg:'🖼️',jpeg:'🖼️',gif:'🖼️',svg:'🖼️',mp4:'🎬',mp3:'🎵'};return m[e]||(t?'📄':'📦')}
+function fileExt(n){return n?(n.split('.').pop()||'file').toUpperCase():'FILE'}
+function fmtBytes(b){if(!b)return'';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
+
+// ── RENDER SKILLS ─────────────────────────────────────────────────────────────
+function renderSkills(list){
+  const c=document.getElementById('skills-list');
+  if(!list.length){c.innerHTML=`<div class="empty-state"><div>🗂<\/div><p>Nessuna skill trovata<\/p><\/div>`;return}
+  c.innerHTML=list.map(s=>`
+    <div class="skill-card${selSkill?.id===s.id?' selected':''}" onclick="selectSkill(${s.id})">
+      <span class="file-type-badge">${fileExt(s.filename)}<\/span>
+      <div class="skill-top">
+        <span class="cat-badge ${catCls(s.category)}">${esc(s.category)}<\/span>
+        <span class="skill-ver">${esc(s.version||'')}<\/span>
+      <\/div>
+      <div class="skill-name">${esc(s.name)}<\/div>
+      ${s.description?`<div class="skill-desc">${esc(s.description)}<\/div>`:''}
+      <div class="skill-tags">${(s.tags||[]).map(t=>`<span class="tag">#${esc(t)}<\/span>`).join('')}<\/div>
+      <div class="skill-footer">
+        <span class="skill-date">📅 ${esc(s.date||'')}<\/span>
+        <div class="skill-actions">
+          <button class="dl-btn" onclick="dlSkill(event,${s.id})">↓ Scarica<\/button>
+          <button class="del-btn" onclick="delSkill(event,${s.id})" title="Elimina">🗑<\/button>
+        <\/div>
+      <\/div>
+    <\/div>`).join('');
+  updateBadge();
+}
+
+function selectSkill(id){selSkill=selSkill?.id===id?null:SKILLS.find(s=>s.id===id);renderSkills(filtered());renderSkillDetail()}
+function filtered(){const q=(document.getElementById('search')?.value||'').toLowerCase();return SKILLS.filter(s=>s.name.toLowerCase().includes(q)||(s.category||'').toLowerCase().includes(q)||(s.tags||[]).some(t=>t.toLowerCase().includes(q)))}
+
+// track which view mode per skill: 'preview' | 'code'
+const previewMode={};
+
+function isHtmlFile(s){
+  if(!s||!s.isText)return false;
+  const ext=(s.filename||'').split('.').pop().toLowerCase();
+  return ext==='html'||ext==='htm';
+}
+
+function renderSkillDetail(){
+  const el=document.getElementById('skill-detail');
+  if(!selSkill){el.innerHTML=`<div class="detail-panel detail-empty"><div class="emoji">🗂<\/div><p>Clicca su una skill per visualizzarla<\/p><p style="margin-top:5px;font-size:10px;color:var(--muted)">Puoi scaricarla dalla card<\/p><\/div>`;return}
+  const s=selSkill,icon=fileIcon(s.filename,s.isText);
+  const isHtml=isHtmlFile(s);
+  // default mode for HTML files is preview
+  if(isHtml&&previewMode[s.id]===undefined) previewMode[s.id]='preview';
+  const mode=previewMode[s.id]||'code';
+
+  let block;
+  if(isHtml){
+    const toggleBar=`<div class="preview-toggle">
+      <button class="ptog-btn${mode==='preview'?' active':''}" onclick="setPreviewMode(${s.id},'preview')">👁 Anteprima<\/button>
+      <button class="ptog-btn${mode==='code'?' active':''}" onclick="setPreviewMode(${s.id},'code')">📄 Codice<\/button>
+    <\/div>`;
+    if(mode==='preview'){
+      // Build a blob URL for the iframe
+      const blob=new Blob([s.content||''],{type:'text/html'});
+      const blobUrl=URL.createObjectURL(blob);
+      block=toggleBar+`<div class="html-iframe-wrap">
+        <iframe class="html-iframe" id="preview-iframe-${s.id}" src="${blobUrl}" sandbox="allow-scripts allow-same-origin" onload="this._blobUrl='${blobUrl}'"><\/iframe>
+        <div class="iframe-overlay-msg">🔍 Anteprima live<\/div>
+      <\/div>`;
+    } else {
+      block=toggleBar+`<div class="code-block"><pre>${esc(s.content||'')}<\/pre><\/div>`;
+    }
+  } else if(s.isText){
+    block=`<div class="code-block"><pre>${esc(s.content||'')}<\/pre><\/div>`;
+  } else {
+    const isHtmlBinary=(s.filename||'').split('.').pop().toLowerCase();
+    const showConvert=(isHtmlBinary==='html'||isHtmlBinary==='htm');
+    block=`<div class="binary-preview">
+      <div class="file-icon">${icon}<\/div>
+      <p>${esc(s.filename)}<\/p>
+      <div class="file-size">${fmtBytes(s.size)} • File binario<\/div>
+      ${showConvert?`<button onclick="convertHtmlBinary(${s.id})" style="margin-top:12px;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%">🔄 Converti in anteprima HTML<\/button>`:''}
+    <\/div>`;
+  }
+
+  el.innerHTML=`<div class="detail-panel animate-in">
+    <div class="detail-header">
+      <div><span class="cat-badge ${catCls(s.category)}" style="display:inline-block;margin-bottom:5px">${esc(s.category)}<\/span><div class="detail-title">${esc(s.name)}<\/div><\/div>
+      <button class="close-btn" onclick="selectSkill(${s.id})">✕<\/button>
+    <\/div>
+    ${block}
+    <button class="dl-btn-full" onclick="dlSkill(event,${s.id})">↓ Scarica ${esc(s.filename||s.name)}<\/button>
+  <\/div>`
+}
+
+function setPreviewMode(id,mode){
+  previewMode[id]=mode;
+  // revoke any old blob URLs to avoid memory leaks
+  const old=document.getElementById('preview-iframe-'+id);
+  if(old&&old._blobUrl) URL.revokeObjectURL(old._blobUrl);
+  renderSkillDetail();
+}
+
+function convertHtmlBinary(id){
+  const s=SKILLS.find(x=>x.id===id);
+  if(!s||!s.data)return;
+  // Try multiple decode strategies
+  let decoded=null;
+  // Strategy 1: base64 → UTF-8 via TextDecoder
+  try{
+    const bs=atob(s.data);
+    const bytes=new Uint8Array(bs.length);
+    for(let i=0;i<bs.length;i++) bytes[i]=bs.charCodeAt(i);
+    decoded=new TextDecoder('utf-8').decode(bytes);
+  }catch(e){}
+  // Strategy 2: base64 → latin1 → unescape
+  if(!decoded||decoded.trim()===''){
+    try{ decoded=decodeURIComponent(escape(atob(s.data))); }catch(e){}
+  }
+  // Strategy 3: raw atob
+  if(!decoded||decoded.trim()===''){
+    try{ decoded=atob(s.data); }catch(e){}
+  }
+  if(!decoded||decoded.trim()===''){
+    showToast('⚠️ Impossibile convertire il file','error');
+    return;
+  }
+  s.isText=true;
+  s.content=decoded;
+  delete s.data;
+  saveDB(SKILLS);
+  renderSkillDetail();
+  renderSkills(filtered());
+  showToast('✅ File HTML convertito!','success');
+}
+
+function dlSkill(e,id){
+  e.stopPropagation();
+  const s=SKILLS.find(x=>x.id===id);if(!s)return;
+  if(s.isText){const b=new Blob([s.content||''],{type:'text/plain'});dl(URL.createObjectURL(b),s.filename||s.name+'.txt')}
+  else if(s.data){const bs=atob(s.data),arr=new Uint8Array(bs.length);for(let i=0;i<bs.length;i++)arr[i]=bs.charCodeAt(i);const b=new Blob([arr],{type:s.mimeType||'application/octet-stream'});dl(URL.createObjectURL(b),s.filename||s.name)}
+}
+function dl(url,name){const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+
+function delSkill(e,id){
+  e.stopPropagation();
+  if(!confirm('Eliminare questa skill?'))return;
+  SKILLS=SKILLS.filter(s=>s.id!==id);
+  if(selSkill?.id===id){selSkill=null;renderSkillDetail()}
+  saveDB(SKILLS);renderSkills(filtered());showToast('🗑 Skill eliminata','error')
+}
+
+function filterSkills(q){
+  const f=SKILLS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||(s.category||'').toLowerCase().includes(q.toLowerCase())||(s.tags||[]).some(t=>t.toLowerCase().includes(q.toLowerCase())));
+  renderSkills(f)
+}
+
+function updateBadge(){
+  const n=SKILLS.length;
+  document.getElementById('header-badge').textContent=n+' Skill';
+  document.getElementById('tc-skills').textContent=n;
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(){
+  modalTags=[];pendingFile=null;
+  ['f-name','f-desc','f-content','f-tag-input'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-ver').value='v1.0';
+  document.getElementById('file-input').value='';
+  document.getElementById('tags-preview').innerHTML='';
+  resetDZ();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open')}
+function handleOverlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal()}
+
+function addTag(){
+  const inp=document.getElementById('f-tag-input'),v=inp.value.trim();
+  if(!v||modalTags.includes(v)){inp.value='';return}
+  modalTags.push(v);inp.value='';renderModalTags()
+}
+function removeTag(t){modalTags=modalTags.filter(x=>x!==t);renderModalTags()}
+function renderModalTags(){document.getElementById('tags-preview').innerHTML=modalTags.map(t=>`<span class="tag-pill">#${esc(t)}<button onclick="removeTag('${esc(t)}')">×<\/button><\/span>`).join('')}
+
+function resetDZ(){
+  const dz=document.getElementById('drop-zone');
+  dz.classList.remove('has-file','dragging');
+  document.getElementById('dz-text').textContent='Trascina qui il file o clicca per selezionarlo';
+  dz.querySelector('.dz-icon').textContent='📂';
+}
+function handleFileInput(inp){if(inp.files[0])processFile(inp.files[0])}
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('dragging');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0])}
+
+function isTextFile(f){
+  // Extension check takes priority — browser MIME detection can be wrong for .html files
+  const textExts=['txt','md','json','html','htm','css','js','ts','jsx','tsx','csv','xml','yaml','yml','sh','py','rb','php','sql'];
+  const ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(textExts.includes(ext))return true;
+  if(f.type.startsWith('text/'))return true;
+  return false;
+}
+
+function processFile(file){
+  const dz=document.getElementById('drop-zone'),isText=isTextFile(file),icon=fileIcon(file.name,isText);
+  if(isText){
+    const r=new FileReader();
+    r.onload=ev=>{
+      pendingFile={name:file.name,isText:true,content:ev.target.result,size:file.size,mimeType:file.type};
+      document.getElementById('f-content').value=ev.target.result;
+      dz.classList.add('has-file');dz.querySelector('.dz-icon').textContent=icon;
+      const htmlHint=ext==='html'||ext==='htm'?' — Anteprima live disponibile ✨':'';
+      document.getElementById('dz-text').textContent=`✅ ${file.name} (${fmtBytes(file.size)})${htmlHint}`;
+      if(!document.getElementById('f-name').value)document.getElementById('f-name').value=file.name.replace(/\.[^.]+$/,'');
+      if((ext==='html'||ext==='htm')&&document.getElementById('f-cat'))document.getElementById('f-cat').value='HTML / Template';
+    };r.readAsText(file,'UTF-8');
+  }else{
+    const r=new FileReader();
+    r.onload=ev=>{
+      pendingFile={name:file.name,isText:false,data:ev.target.result.split(',')[1],size:file.size,mimeType:file.type};
+      dz.classList.add('has-file');dz.querySelector('.dz-icon').textContent=icon;
+      document.getElementById('dz-text').textContent=`✅ ${file.name} (${fmtBytes(file.size)})`;
+      if(!document.getElementById('f-name').value)document.getElementById('f-name').value=file.name.replace(/\.[^.]+$/,'');
+    };r.readAsDataURL(file);
+  }
+}
+
+function saveSkill(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){showToast('⚠️ Inserisci un nome','error');return}
+  const text=document.getElementById('f-content').value.trim();
+  if(!pendingFile&&!text){showToast('⚠️ Aggiungi un file o scrivi il contenuto','error');return}
+  const today=new Date().toLocaleDateString('it-IT');
+  const sk={id:nextId++,name,description:document.getElementById('f-desc').value.trim(),
+    category:document.getElementById('f-cat').value,version:document.getElementById('f-ver').value.trim()||'v1.0',
+    tags:[...modalTags],date:today};
+  if(pendingFile){
+    sk.filename=pendingFile.name;sk.size=pendingFile.size;
+    if(pendingFile.isText){sk.isText=true;sk.content=pendingFile.content}
+    else{sk.isText=false;sk.data=pendingFile.data;sk.mimeType=pendingFile.mimeType}
+  }else{
+    sk.filename=name.toLowerCase().replace(/\s+/g,'-')+'.txt';sk.isText=true;sk.content=text;
+  }
+  SKILLS.push(sk);saveDB(SKILLS);closeModal();renderSkills(filtered());showToast('✅ Skill salvata!','success');
+}
+
+// ── ROADMAP ───────────────────────────────────────────────────────────────────
+const STEPS=[
+  {id:1,phase:"01",icon:"📥",title:"Ricezione Task",color:"#7c6af7",owner:"Account Manager → Tu",
+   description:"L'account manager assegna il progetto e invia tutto il materiale: file TXT, shooting, logo, link social, siti vecchi.",
+   deliverables:["File TXT con dati cliente","Shooting / Logo del brand","Link profili social","Siti vecchi (restyling)","Struttura sito + keyword map"],tools:[]},
+  {id:2,phase:"02",icon:"📋",title:"Strutturazione Brief",color:"#9b6af7",owner:"Tu",
+   description:"Analisi di tutto il materiale ricevuto e trasformazione in brief operativo completo con Project Bible.",
+   deliverables:["Brief strutturato e validato","Project Bible completo","Mappa pagine e sezioni","Keyword mapping per pagina"],tools:["Project Bible v2 Skill"]},
+  {id:3,phase:"03",icon:"🔍",title:"Ricerca Template",color:"#c26af7",owner:"Tu",
+   description:"Selezione del template kit più adatto allo stile, settore e obiettivo comunicativo del cliente.",
+   deliverables:["Template kit selezionato","Moodboard visivo","Referenze di stile approvate"],tools:[]},
+  {id:4,phase:"04",icon:"⚙️",title:"Import & Setup",color:"#f76ac2",owner:"Tu",
+   description:"Importazione del template e configurazione completa di pagine, menù, sezioni e layout con immagini.",
+   deliverables:["Struttura sito importata","Menù configurato","Layout sezioni definito","Immagini inserite"],tools:[]},
+  {id:5,phase:"05",icon:"✍️",title:"Copywriting",color:"#f7a26c",owner:"Tu",
+   description:"Creazione copy per tutte le sezioni del sito, ottimizzato per SEO, conversione e tono del brand.",
+   deliverables:["Copy completo per ogni pagina","Headline e sottotitoli","Body copy per sezione","Meta title e description","CTA ottimizzati"],tools:["Web Copywriter v2 Skill"]},
+  {id:6,phase:"06",icon:"🚀",title:"Revisione & Consegna",color:"#6affc4",owner:"Tu → Account Manager",
+   description:"Test responsive su tutti i dispositivi, ottimizzazione finale, checklist qualità e consegna formale.",
+   deliverables:["Test responsive completato","Performance ottimizzata","Checklist QA superata","Progetto consegnato"],tools:[]},
+];
+
+function isMobile(){return window.innerWidth<=760}
+
+function detailHTML(s){
+  return `<div class="detail-step animate-in" style="border-color:${s.color}">
+    <div class="ds-header"><span class="ds-emoji">${s.icon}<\/span><div><div class="ds-phase" style="color:${s.color}">FASE ${s.phase}<\/div><div class="ds-title">${s.title}<\/div><\/div><\/div>
+    <p class="ds-desc">${s.description}<\/p>
+    <div class="ds-section" style="margin-bottom:12px"><h4>📦 Deliverable<\/h4>${s.deliverables.map(d=>`<div class="deliverable"><span class="arrow" style="color:${s.color}">→<\/span>${d}<\/div>`).join('')}<\/div>
+    ${s.tools.length?`<div class="ds-section"><h4>🛠 Skill Collegate<\/h4><div class="tools-list">${s.tools.map(t=>`<span class="tool-badge" style="background:${s.color}18;color:${s.color};border:1px solid ${s.color}38">${t}<\/span>`).join('')}<\/div><\/div>`:''}
+    <div style="margin-top:12px;padding-top:11px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);font-weight:600">👤 ${s.owner}<\/div>
+  <\/div>`;
+}
+
+function renderRoadmap(){
+  document.getElementById('roadmap-grid').innerHTML=STEPS.map(s=>`
+    <div class="step-card${selStep?.id===s.id?' active':''}"
+         id="step-card-${s.id}"
+         style="${selStep?.id===s.id?`border-color:${s.color};background:${s.color}16;box-shadow:0 6px 18px ${s.color}2e`:''}"
+         onclick="selectStep(${s.id})">
+      <div class="step-top">
+        <span class="step-emoji">${s.icon}<\/span>
+        <div>
+          <div class="step-phase">FASE ${s.phase}<\/div>
+          <div class="step-title"${selStep?.id===s.id?` style="color:${s.color}"`:''} >${s.title}<\/div>
+        <\/div>
+      <\/div>
+      <div class="step-desc">${s.description.substring(0,72)}…<\/div>
+      <div class="step-owner">👤 ${s.owner}<\/div>
+    <\/div>
+    <!-- inline detail slot for mobile -->
+    <div class="inline-detail${selStep?.id===s.id?' open':''}" id="inline-${s.id}">
+      ${selStep?.id===s.id?detailHTML(s):''}
+    <\/div>`).join('');
+  renderPipelineTop();
+}
+
+function selectStep(id){
+  selStep=selStep?.id===id?null:STEPS.find(s=>s.id===id);
+  renderRoadmap();
+  renderStepDetail(); // desktop right column
+  // smooth scroll to inline detail on mobile
+  if(isMobile()&&selStep){
+    setTimeout(()=>{
+      const el=document.getElementById(`inline-${selStep.id}`);
+      if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    },50);
+  }
+}
+
+function renderStepDetail(){
+  const el=document.getElementById('roadmap-detail');
+  const pip=`<div class="pipeline" style="margin-top:11px"><h4>⚡ Pipeline Completa<\/h4><div class="pipeline-track" id="pipeline-track-desktop"><\/div><div class="pipeline-labels"><span>Inizio<\/span><span>Consegna<\/span><\/div><\/div>`;
+  if(!selStep){
+    el.innerHTML=`<div class="detail-step"><div style="text-align:center;padding:32px 14px;border:1px dashed var(--border);border-radius:11px;color:var(--muted)"><div style="font-size:26px;margin-bottom:7px">👆<\/div><p style="font-size:12px">Seleziona una fase per i dettagli<\/p><\/div><\/div>${pip}`;
+  }else{
+    el.innerHTML=detailHTML(selStep)+pip;
+  }
+  renderPipelineDesktop();
+}
+
+function renderPipelineTop(){
+  // mobile top pipeline
+  const t=document.getElementById('pipeline-track-top');if(!t)return;
+  t.innerHTML=pipelineNodes();
+}
+function renderPipelineDesktop(){
+  const t=document.getElementById('pipeline-track-desktop');if(!t)return;
+  t.innerHTML=pipelineNodes();
+}
+function pipelineNodes(){
+  return STEPS.map((s,i)=>`<div class="pip-node" style="border-color:${s.color};${selStep?.id===s.id?`background:${s.color};box-shadow:0 0 9px ${s.color}55`:'background:var(--card2)'}" onclick="selectStep(${s.id})" title="${s.title}">${s.icon}<\/div>${i<STEPS.length-1?`<div class="pip-line" style="background:linear-gradient(to right,${s.color},${STEPS[i+1].color})"><\/div>`:''}`).join('');
+}
+
+function showTab(tab,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('section-skills').className=tab==='skills'?'section-visible animate-in':'section-hidden';
+  document.getElementById('section-roadmap').className=tab==='roadmap'?'section-visible animate-in':'section-hidden';
+  document.getElementById('section-project').className=tab==='project'?'section-visible animate-in':'section-hidden';
+  if(tab==='project')renderProject();
+}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+
+// ── PROGETTO ─────────────────────────────────────────────────────────────────
+const PK='skill_project_v2';
+
+// CHECKLIST DATA — comune a tutti i tipi progetto
+const CATS_COMUNE=[
+  {id:'design',icon:'🎨',title:'Design & Layout',color:'#7c6af7',items:[
+    {id:'d1',text:'Hai scelto e importato un template performante adatto al brand?'},
+    {id:'d2',text:'Il design è coerente con l\'identità visiva del cliente?'},
+    {id:'d3',text:'Logo in HD e favicon sono inseriti correttamente?'},
+    {id:'d4',text:'La hero section cattura l\'attenzione e comunica il valore?'},
+    {id:'d5',text:'Le immagini in tutto il sito sono reali? Evita foto stock generiche'},
+    {id:'d6',text:'Le call-to-action sono posizionate in modo strategico?'},
+    {id:'d7',text:'L\'esperienza di navigazione (UX) è semplice e intuitiva?'},
+    {id:'d8',text:'Menu di navigazione funziona correttamente su tutti i livelli?'},
+    {id:'d9',text:'Il footer è completo con link utili, contatti e pagine legali?'},
+    {id:'d10',text:'Hai controllato la versione mobile di tutte le pagine principali?'},
+    {id:'d11',text:'Il sito è responsive su smartphone, tablet e desktop?'},
+    {id:'d12',text:'I font, le dimensioni e i colori sono consistenti in tutto il sito?'},
+    {id:'d13',text:'Le animazioni e le transizioni non rallentano la navigazione?'},
+  ]},
+  {id:'pages',icon:'📄',title:'Pagine & Contenuti',color:'#c26af7',items:[
+    {id:'p1',text:'Hai creato tutte le pagine richieste nel brief?'},
+    {id:'p2',text:'I testi sono stati inseriti e controllati per errori ortografici?'},
+    {id:'p3',text:'I dati aziendali sono corretti (indirizzo, P.IVA, telefono, email)?'},
+    {id:'p4',text:'La pagina Chi Siamo racconta bene il brand e il team?'},
+    {id:'p5',text:'La pagina Contatti ha indirizzo, mappa, form e orari?'},
+    {id:'p6',text:'Il form di contatto invia correttamente le notifiche?'},
+    {id:'p7',text:'Hai creato una pagina 404 personalizzata?'},
+    {id:'p8',text:'Tutti i link interni ed esterni funzionano correttamente?'},
+    {id:'p9',text:'I bottoni e i CTA rimandano alle pagine giuste?'},
+    {id:'p10',text:'Hai inserito le sezioni richieste nella home (servizi, testimonianze, ecc.)?'},
+  ]},
+  {id:'performance',icon:'⚡',title:'Performance & Responsive',color:'#f7a26c',items:[
+    {id:'perf1',text:'Il sito si carica in meno di 2-3 secondi?'},
+    {id:'perf2',text:'Hai ottimizzato il peso delle immagini (WebP o compressione)?'},
+    {id:'perf3',text:'Google PageSpeed Insights: punteggio accettabile su mobile e desktop?'},
+    {id:'perf4',text:'Hai pulito il database da plugin inutili e dati non necessari?'},
+    {id:'perf5',text:'Il sito è responsive su tutti i dispositivi e browser principali?'},
+    {id:'perf6',text:'Le pagine più importanti sono ottimizzate per il mobile (Home, Contatti)?'},
+    {id:'perf7',text:'Hai testato su Chrome, Safari, Firefox e su iOS e Android?'},
+  ]},
+  {id:'legal',icon:'⚖️',title:'Pagine Legali & Cookie',color:'#6affc4',items:[
+    {id:'l1',text:'Hai inserito la pagina Privacy Policy?'},
+    {id:'l2',text:'Hai inserito la pagina Cookie Policy?'},
+    {id:'l3',text:'Hai inserito la pagina Termini e Condizioni?'},
+    {id:'l4',text:'La barra cookie è configurata e funzionante?'},
+    {id:'l5',text:'I link a privacy, cookie e preferenze sono visibili nel footer?'},
+    {id:'l6',text:'I form di contatto hanno le spunte di accettazione privacy?'},
+    {id:'l7',text:'Il copyright nel footer è aggiornato con l\'anno corrente?'},
+  ]},
+];
+
+// CATEGORIE AGGIUNTIVE solo per e-commerce
+const CATS_ECOMMERCE=[
+  {id:'shop',icon:'🛒',title:'Shop & Prodotti',color:'#f76ac2',items:[
+    {id:'s1',text:'I prodotti sono caricati con titolo, descrizione, immagini e prezzo?'},
+    {id:'s2',text:'Le categorie prodotto sono create e organizzate correttamente?'},
+    {id:'s3',text:'Le varianti (taglia, colore, ecc.) funzionano correttamente?'},
+    {id:'s4',text:'Le immagini dei prodotti hanno testo alternativo (alt text)?'},
+    {id:'s5',text:'Cross-sell e up-sell sono configurati nelle schede prodotto?'},
+    {id:'s6',text:'Hai inserito una funzione di ricerca prodotti nel sito?'},
+    {id:'s7',text:'La dashboard del cliente è intuitiva e funziona correttamente?'},
+    {id:'s8',text:'Se vendi prodotti digitali, il download funziona dopo l\'acquisto?'},
+  ]},
+  {id:'checkout',icon:'💳',title:'Checkout & Pagamenti',color:'#f7a26c',items:[
+    {id:'c1',text:'Il carrello è facilmente accessibile dall\'header?'},
+    {id:'c2',text:'Hai personalizzato il design del carrello e della pagina cassa?'},
+    {id:'c3',text:'Il processo di checkout è snello e ridotto al minimo?'},
+    {id:'c4',text:'I metodi di pagamento sono attivi e funzionanti?'},
+    {id:'c5',text:'Hai impostato correttamente le aliquote IVA?'},
+    {id:'c6',text:'Le spese di spedizione vengono applicate correttamente?'},
+    {id:'c7',text:'Le email di conferma ordine e avvisi funzionano?'},
+    {id:'c8',text:'Hai definito se gli utenti ordinano come ospiti o registrati?'},
+    {id:'c9',text:'Hai effettuato un ordine di test completo con pagamento reale?'},
+    {id:'c10',text:'I codici sconto funzionano correttamente (%, importo, scadenza)?'},
+    {id:'c11',text:'Hai gestito il magazzino e la gestione delle scorte?'},
+  ]},
+  {id:'ecommerce_extra',icon:'🔗',title:'Integrazioni Shop',color:'#9b6af7',items:[
+    {id:'e1',text:'Come appaiono i prodotti condivisi su WhatsApp o Facebook? Snippet OK?'},
+    {id:'e2',text:'Hai considerato l\'integrazione con Instagram Shopping o Facebook Shop?'},
+    {id:'e3',text:'Hai configurato un sistema per raccogliere recensioni sui prodotti?'},
+    {id:'e4',text:'Il processo di registrazione/login/logout funziona lato utente?'},
+    {id:'e5',text:'Pagina resi, rimborsi e spedizioni è presente e completa?'},
+  ]},
+];
+
+// CATEGORIE AGGIUNTIVE solo per vetrina
+const CATS_VETRINA=[
+  {id:'vetrina_extra',icon:'🌐',title:'Funzionalità Sito',color:'#9b6af7',items:[
+    {id:'v1',text:'Hai creato una sezione portfolio o galleria lavori (se richiesto)?'},
+    {id:'v2',text:'I form di preventivo o richiesta info funzionano correttamente?'},
+    {id:'v3',text:'Hai inserito link ai profili social nel header o footer?'},
+    {id:'v4',text:'La sezione servizi è chiara e ben strutturata?'},
+    {id:'v5',text:'Hai inserito testimonianze o recensioni clienti?'},
+  ]},
+];
+
+function getCats(type){
+  if(type==='ecommerce') return [...CATS_COMUNE, ...CATS_ECOMMERCE];
+  return [...CATS_COMUNE, ...CATS_VETRINA];
+}
+
+function getAllItems(type){
+  return getCats(type).flatMap(c=>c.items);
+}
+
+function loadProject(){try{const r=localStorage.getItem(PK);return r?JSON.parse(r):null}catch(e){return null}}
+// saveProject defined in GitHub sync section
+
+let PROJECT=loadProject();
+let selectedType=null; // 'vetrina' | 'ecommerce'
+
+function renderProject(){
+  const el=document.getElementById('project-content');
+  if(!PROJECT){
+    el.innerHTML=`
+      <div class="project-setup">
+        <div class="ps-icon">🚀<\/div>
+        <h2>Nuovo Progetto<\/h2>
+        <p>Inserisci il nome del progetto e scegli il tipo di sito<\/p>
+        <div class="project-name-row">
+          <input type="text" id="pname-input" placeholder="es. Sito Pizzeria Roma" maxlength="60"
+            onkeydown="if(event.key==='Enter')startProject()">
+        <\/div>
+        <div class="project-type-row">
+          <button class="type-btn${selectedType==='vetrina'?' selected':''}" onclick="selectType('vetrina')">
+            <span class="tb-icon">🌐<\/span>Sito Vetrina
+          <\/button>
+          <button class="type-btn${selectedType==='ecommerce'?' selected':''}" onclick="selectType('ecommerce')">
+            <span class="tb-icon">🛒<\/span>E-Commerce
+          <\/button>
+        <\/div>
+        <button class="start-btn" onclick="startProject()" id="start-btn-el" ${selectedType?'':'disabled'}>Inizia Progetto →<\/button>
+      <\/div>`;
+    return;
+  }
+
+  const cats=getCats(PROJECT.type);
+  const allItems=getAllItems(PROJECT.type);
+  const total=allItems.length;
+  const doneCount=PROJECT.checks.filter(Boolean).length;
+  const pct=total>0?Math.round((doneCount/total)*100):0;
+  const allDone=doneCount===total;
+
+  const typeBadge=PROJECT.type==='ecommerce'
+    ?'<span class="gp-type-badge" style="background:rgba(247,162,108,.12);color:#f7a26c;border:1px solid rgba(247,162,108,.28)">🛒 E-Commerce<\/span>'
+    :'<span class="gp-type-badge" style="background:rgba(124,106,247,.12);color:#a99fff;border:1px solid rgba(124,106,247,.28)">🌐 Sito Vetrina<\/span>';
+
+  const globalCard=`
+    <div class="global-progress-card">
+      <div class="gp-top">
+        <div class="gp-info">
+          <div class="gp-name">📁 ${esc(PROJECT.name)}<\/div>
+          <div class="gp-meta">Avviato il ${PROJECT.startDate}<\/div>
+          ${typeBadge}
+        <\/div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div class="gp-fraction">${doneCount}<span>/${total}<\/span><\/div>
+          <button class="reset-btn" onclick="resetProject()">🔄 Reset<\/button>
+        <\/div>
+      <\/div>
+      <div class="gp-bar-wrap"><div class="gp-bar" style="width:${pct}%"><\/div><\/div>
+      <div class="gp-pct">${pct}% completato<\/div>
+    <\/div>`;
+
+  const allDoneBanner=allDone?`
+    <div class="all-done-banner animate-in">
+      <div class="adb-icon">🎉<\/div>
+      <h3>Progetto Completato!<\/h3>
+      <p>Ottimo lavoro! Hai spuntato tutti i ${total} punti.<br>Pronto per consegnare all'account manager?<\/p>
+      <button class="reset-btn" style="margin:0 auto;padding:8px 18px;font-size:12px" onclick="resetProject()">🔄 Nuovo progetto<\/button>
+    <\/div>`:'';
+
+  const accordion=cats.map((cat,ci)=>{
+    const catItems=cat.items;
+    const catDone=catItems.filter(item=>{
+      const idx=allItems.findIndex(x=>x.id===item.id);
+      return PROJECT.checks[idx];
+    }).length;
+    const catTotal=catItems.length;
+    const catPct=Math.round((catDone/catTotal)*100);
+    const isOpen=PROJECT.openCats?.includes(cat.id)!==false;
+
+    return `
+      <div class="acc-cat${catDone>0?' has-done':''}${isOpen?' open':''}" id="acc-${cat.id}">
+        <div class="acc-head" onclick="toggleCat('${cat.id}')">
+          <span class="acc-icon">${cat.icon}<\/span>
+          <div class="acc-info">
+            <div class="acc-title">${cat.title}<\/div>
+            <div class="acc-sub">${catDone}/${catTotal} completati<\/div>
+          <\/div>
+          <div class="acc-right">
+            <span class="acc-frac${catDone===catTotal?' complete':''}">${catPct}%<\/span>
+            <span class="acc-chevron">▼<\/span>
+          <\/div>
+        <\/div>
+        <div class="acc-bar-wrap">
+          <div class="acc-bar" style="width:${catPct}%;background:${cat.color}"><\/div>
+        <\/div>
+        <div class="acc-body">
+          <div class="cl-list">
+            ${catItems.map(item=>{
+              const idx=allItems.findIndex(x=>x.id===item.id);
+              const done=PROJECT.checks[idx]||false;
+              const doneDate=PROJECT.checkDates?.[idx]||null;
+              return `<div class="cl-item${done?' done':''}" onclick="toggleCheck('${item.id}')">
+                <div class="cl-box">${done?'✓':''}<\/div>
+                <div class="cl-text">${esc(item.text)}<\/div>
+                ${done&&doneDate?`<div class="cl-date">${doneDate}<\/div>`:''}
+              <\/div>`;
+            }).join('')}
+          <\/div>
+        <\/div>
+      <\/div>`;
+  }).join('');
+
+  el.innerHTML=`<div class="project-active">${globalCard}${allDoneBanner}${accordion}<\/div>`;
+}
+
+function selectType(t){
+  selectedType=t;
+  renderProject();
+  // restore name if typed
+  const inp=document.getElementById('pname-input');
+  if(inp) inp.focus();
+}
+
+function startProject(){
+  const n=(document.getElementById('pname-input')?.value||'').trim();
+  if(!n){showToast('⚠️ Inserisci il nome del progetto','error');return}
+  if(!selectedType){showToast('⚠️ Scegli il tipo di sito','error');return}
+  const allItems=getAllItems(selectedType);
+  PROJECT={
+    name:n, type:selectedType,
+    startDate:new Date().toLocaleDateString('it-IT'),
+    checks:new Array(allItems.length).fill(false),
+    checkDates:new Array(allItems.length).fill(null),
+    openCats:getCats(selectedType).map(c=>c.id)
+  };
+  saveProject(PROJECT);
+  renderProject();
+  showToast('🚀 Progetto avviato!','success');
+  updateProjectTabBadge();
+}
+
+function toggleCheck(itemId){
+  if(!PROJECT)return;
+  const allItems=getAllItems(PROJECT.type);
+  const idx=allItems.findIndex(x=>x.id===itemId);
+  if(idx<0)return;
+  PROJECT.checks[idx]=!PROJECT.checks[idx];
+  PROJECT.checkDates[idx]=PROJECT.checks[idx]?new Date().toLocaleDateString('it-IT'):null;
+  saveProject(PROJECT);
+  renderProject();
+}
+
+function toggleCat(catId){
+  if(!PROJECT)return;
+  if(!PROJECT.openCats)PROJECT.openCats=getCats(PROJECT.type).map(c=>c.id);
+  const i=PROJECT.openCats.indexOf(catId);
+  if(i>=0) PROJECT.openCats.splice(i,1);
+  else PROJECT.openCats.push(catId);
+  saveProject(PROJECT);
+  const el=document.getElementById('acc-'+catId);
+  if(el)el.classList.toggle('open');
+  const ch=el?.querySelector('.acc-chevron');
+  if(ch)ch.style.transform=el.classList.contains('open')?'rotate(180deg)':'rotate(0deg)';
+}
+
+function resetProject(){
+  if(!confirm('Iniziare un nuovo progetto? I progressi attuali andranno persi.'))return;
+  PROJECT=null; selectedType=null;
+  localStorage.removeItem(PK);
+  renderProject();
+  showToast('🔄 Pronto per un nuovo progetto','success');
+  updateProjectTabBadge();
+}
+
+function updateProjectTabBadge(){
+  const tb=document.getElementById('tab-project');
+  if(!tb)return;
+  if(PROJECT){
+    const total=getAllItems(PROJECT.type).length;
+    const done=PROJECT.checks.filter(Boolean).length;
+    tb.innerHTML=`📋 Progetto <span style="background:rgba(106,255,196,.2);color:#6affc4;border-radius:9px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:2px">${done}/${total}<\/span>`;
+  } else {
+    tb.innerHTML='📋 Progetto Attivo';
+  }
+}
+
+
+// ── GITHUB SYNC ───────────────────────────────────────────────────────────────
+const GH_REPO_OWNER = 'francescolamagna9';
+const GH_REPO_NAME  = 'Dashboard-';
+const GH_FILE_PATH  = 'dashboard-data.json';
+const GH_TOKEN_KEY  = 'gh_pat_skill';
+const GH_BRANCH     = 'main';
+
+let ghToken = localStorage.getItem(GH_TOKEN_KEY) || null;
+let ghUser   = null;
+let ghFileSha = null; // needed for update calls
+
+// ── status indicator ─────────────────────────────────────────────────────────
+function setSyncStatus(state, label){
+  const st=document.getElementById('sync-status');
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-label');
+  if(!st)return;
+  st.className='sync-status '+state;
+  dot.className='sync-dot '+(state==='connected'?'green':state==='syncing'?'pulse':'red');
+  lbl.textContent=label||'GitHub';
+}
+
+// ── token modal ───────────────────────────────────────────────────────────────
+function openTokenModal(){
+  document.getElementById('token-modal-overlay').classList.add('open');
+  renderTokenModal();
+}
+function closeTokenModal(){ document.getElementById('token-modal-overlay').classList.remove('open'); }
+function handleTokenOverlay(e){ if(e.target===document.getElementById('token-modal-overlay'))closeTokenModal(); }
+
+function renderTokenModal(){
+  const el=document.getElementById('token-modal-body');
+  if(ghToken&&ghUser){
+    el.innerHTML=`
+      <div class="gh-user-row">
+        <img class="gh-avatar" src="${ghUser.avatar_url}" alt="">
+        <div><div class="gh-uname">@${ghUser.login}<\/div><div class="gh-repo">📁 ${GH_REPO_OWNER}/${GH_REPO_NAME}<\/div><\/div>
+      <\/div>
+      <div class="sync-log" id="sync-log">Ultimo sync: ${localStorage.getItem('gh_last_sync')||'mai'}<\/div>
+      <div class="sync-actions">
+        <button class="sync-pull-btn" onclick="ghPull()">⬇ Scarica da GitHub<\/button>
+        <button class="sync-push-btn" onclick="ghPush()">⬆ Salva su GitHub<\/button>
+      <\/div>
+      <button class="gh-disconnect-btn" onclick="ghDisconnect()">🔌 Disconnetti account<\/button>`;
+  } else {
+    el.innerHTML=`
+      <div class="token-info">
+        🔑 Inserisci il tuo <strong>Personal Access Token<\/strong> GitHub con scope <code>repo<\/code>.<br>
+        Il token viene salvato solo sul tuo dispositivo.
+      <\/div>
+      <div class="field" style="margin-bottom:0">
+        <label>Personal Access Token<\/label>
+        <div class="token-field">
+          <input type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+          <button class="token-eye" onclick="toggleTokenVisibility()">👁<\/button>
+        <\/div>
+      <\/div>
+      <button class="gh-connect-btn" onclick="ghConnect()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/><\/svg>
+        Connetti GitHub
+      <\/button>`;
+  }
+}
+
+function toggleTokenVisibility(){
+  const inp=document.getElementById('gh-token-input');
+  if(inp) inp.type=inp.type==='password'?'text':'password';
+}
+
+async function ghConnect(){
+  const inp=document.getElementById('gh-token-input');
+  const tok=(inp?.value||'').trim();
+  if(!tok){showToast('⚠️ Inserisci il token','error');return;}
+  setSyncStatus('syncing','Verifica...');
+  try{
+    const res=await fetch('https://api.github.com/user',{headers:{Authorization:'token '+tok,Accept:'application/vnd.github.v3+json'}});
+    if(!res.ok)throw new Error('Token non valido');
+    ghUser=await res.json();
+    ghToken=tok;
+    localStorage.setItem(GH_TOKEN_KEY,tok);
+    setSyncStatus('connected','@'+ghUser.login);
+    renderTokenModal();
+    showToast('✅ Connesso come @'+ghUser.login,'success');
+    // auto pull on first connect
+    await ghPull(true);
+  }catch(e){
+    setSyncStatus('disconnected','GitHub');
+    showToast('❌ '+e.message,'error');
+  }
+}
+
+async function ghDisconnect(){
+  if(!confirm('Disconnettere GitHub? I dati restano locali.'))return;
+  ghToken=null; ghUser=null; ghFileSha=null;
+  localStorage.removeItem(GH_TOKEN_KEY);
+  setSyncStatus('disconnected','GitHub');
+  renderTokenModal();
+  showToast('🔌 Disconnesso','error');
+}
+
+// ── PULL: load data from GitHub ───────────────────────────────────────────────
+async function ghPull(silent=false){
+  if(!ghToken){openTokenModal();return;}
+  setSyncStatus('syncing','Carico...');
+  setLogMsg('⏳ Download da GitHub...');
+  try{
+    const res=await fetch(`https://api.github.com/repos/${GH_REPO_OWNER}/${GH_REPO_NAME}/contents/${GH_FILE_PATH}?ref=${GH_BRANCH}`,
+      {headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});
+    if(res.status===404){
+      // file doesn't exist yet — push current data
+      setSyncStatus('connected','@'+(ghUser?.login||''));
+      setLogMsg('📂 Nessun file remoto, push dei dati locali...');
+      await ghPush(true);
+      return;
+    }
+    if(!res.ok)throw new Error('Errore GitHub '+res.status);
+    const file=await res.json();
+    ghFileSha=file.sha;
+    const decoded=JSON.parse(atob(file.content.split('\n').join('')));
+    // merge: remote wins
+    if(decoded.skills){ SKILLS=decoded.skills; saveDB(SKILLS); }
+    if(decoded.project){ PROJECT=decoded.project; saveProject(PROJECT); }
+    renderSkills(filtered()); renderSkillDetail(); updateBadge(); updateProjectTabBadge();
+    const now=new Date().toLocaleString('it-IT');
+    localStorage.setItem('gh_last_sync',now);
+    setSyncStatus('connected','@'+(ghUser?.login||''));
+    setLogMsg('✅ Sincronizzato: '+now);
+    if(!silent)showToast('⬇ Dati scaricati da GitHub','success');
+  }catch(e){
+    setSyncStatus('connected','@'+(ghUser?.login||''));
+    setLogMsg('❌ '+e.message);
+    if(!silent)showToast('❌ Pull fallito: '+e.message,'error');
+  }
+}
+
+// ── PUSH: save data to GitHub ─────────────────────────────────────────────────
+async function ghPush(silent=false){
+  if(!ghToken){openTokenModal();return;}
+  setSyncStatus('syncing','Salvo...');
+  setLogMsg('⏳ Upload su GitHub...');
+  try{
+    const payload=JSON.stringify({skills:SKILLS,project:PROJECT,updatedAt:new Date().toISOString()},null,2);
+    const encoded=btoa(unescape(encodeURIComponent(payload)));
+    const body={message:'Dashboard sync '+new Date().toLocaleString('it-IT'),content:encoded,branch:GH_BRANCH};
+    if(ghFileSha) body.sha=ghFileSha;
+    const res=await fetch(`https://api.github.com/repos/${GH_REPO_OWNER}/${GH_REPO_NAME}/contents/${GH_FILE_PATH}`,
+      {method:'PUT',headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+       body:JSON.stringify(body)});
+    if(!res.ok){
+      const err=await res.json();
+      // sha conflict — fetch latest sha and retry
+      if(res.status===409||res.status===422){
+        await refreshSha();
+        await ghPush(silent);
+        return;
+      }
+      throw new Error(err.message||'Errore GitHub '+res.status);
+    }
+    const data=await res.json();
+    ghFileSha=data.content?.sha||ghFileSha;
+    const now=new Date().toLocaleString('it-IT');
+    localStorage.setItem('gh_last_sync',now);
+    setSyncStatus('connected','@'+(ghUser?.login||''));
+    setLogMsg('✅ Salvato: '+now);
+    if(!silent)showToast('⬆ Dati salvati su GitHub','success');
+  }catch(e){
+    setSyncStatus('connected','@'+(ghUser?.login||''));
+    setLogMsg('❌ '+e.message);
+    if(!silent)showToast('❌ Push fallito: '+e.message,'error');
+  }
+}
+
+async function refreshSha(){
+  try{
+    const res=await fetch(`https://api.github.com/repos/${GH_REPO_OWNER}/${GH_REPO_NAME}/contents/${GH_FILE_PATH}?ref=${GH_BRANCH}`,
+      {headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});
+    if(res.ok){const f=await res.json();ghFileSha=f.sha;}
+  }catch(e){}
+}
+
+function setLogMsg(msg){
+  const el=document.getElementById('sync-log');
+  if(el)el.textContent=msg;
+}
+
+// auto-push when skills or project change
+function saveDB(d){
+  try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){showToast('⚠️ Storage pieno','error')}
+  if(ghToken) debounceAutoPush();
+}
+function saveProject(p){
+  try{localStorage.setItem(PK,JSON.stringify(p))}catch(e){}
+  if(ghToken) debounceAutoPush();
+}
+
+let autoPushTimer=null;
+function debounceAutoPush(){
+  clearTimeout(autoPushTimer);
+  autoPushTimer=setTimeout(()=>ghPush(true),3000);
+}
+
+// ── init GitHub on load ───────────────────────────────────────────────────────
+async function initGitHub(){
+  if(!ghToken){setSyncStatus('disconnected','GitHub');return;}
+  setSyncStatus('syncing','Connetto...');
+  try{
+    const res=await fetch('https://api.github.com/user',{headers:{Authorization:'token '+ghToken,Accept:'application/vnd.github.v3+json'}});
+    if(!res.ok)throw new Error();
+    ghUser=await res.json();
+    setSyncStatus('connected','@'+ghUser.login);
+    await ghPull(true);
+  }catch(e){
+    ghToken=null; localStorage.removeItem(GH_TOKEN_KEY);
+    setSyncStatus('disconnected','GitHub');
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderSkills(SKILLS);renderSkillDetail();renderRoadmap();renderStepDetail();updateBadge();updateProjectTabBadge();
+initGitHub();
+</script>
+
+<!-- GITHUB TOKEN MODAL -->
+<div class="modal-overlay" id="token-modal-overlay" onclick="handleTokenOverlay(event)">
+  <div class="token-modal">
+    <div class="modal-header">
+      <h2>⚙ GitHub Sync</h2>
+      <button class="close-btn" onclick="closeTokenModal()">✕</button>
+    </div>
+    <div id="token-modal-body"></div>
+  </div>
+</div>
+
+</body>
+</html>
