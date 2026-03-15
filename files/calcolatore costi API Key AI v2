@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calcolatore AI — Quanto costa integrare Claude nella tua azienda</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #1a1a18;
+  --ink-mid: #4a4a46;
+  --ink-light: #8a8a84;
+  --paper: #faf9f6;
+  --paper-warm: #f2f0ea;
+  --paper-card: #ffffff;
+  --accent: #2d5a3d;
+  --accent-light: #e8f0eb;
+  --accent-mid: #4a8a5e;
+  --gold: #9a6f00;
+  --gold-bg: #fdf6e3;
+  --border: #dddbd3;
+  --shadow: 0 2px 16px rgba(26,26,24,0.07);
+  --shadow-hover: 0 8px 32px rgba(26,26,24,0.13);
+  --radius: 14px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.hero {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 60px 40px 52px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero-blob1 {
+  position: absolute; top: -70px; left: -70px;
+  width: 320px; height: 320px; border-radius: 50%;
+  background: rgba(45,90,61,0.18); pointer-events: none;
+}
+.hero-blob2 {
+  position: absolute; bottom: -90px; right: -50px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: rgba(154,111,0,0.13); pointer-events: none;
+}
+.hero-eyebrow {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--accent-mid);
+  margin-bottom: 14px; position: relative; z-index: 1;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 5vw, 46px); font-weight: 600;
+  line-height: 1.15; margin-bottom: 14px;
+  position: relative; z-index: 1;
+}
+.hero p {
+  font-size: 16px; font-weight: 300;
+  color: rgba(250,249,246,0.68);
+  max-width: 540px; margin: 0 auto;
+  position: relative; z-index: 1;
+}
+
+.container { max-width: 920px; margin: 0 auto; padding: 0 20px 60px; }
+
+.step-label {
+  display: flex; align-items: center; gap: 10px;
+  margin: 48px 0 18px;
+}
+.step-num {
+  width: 28px; height: 28px; background: var(--ink); color: var(--paper);
+  border-radius: 50%; font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-text {
+  font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600;
+}
+
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 10px;
+}
+@media (max-width: 680px) { .model-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.model-card {
+  background: var(--paper-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+  position: relative;
+  user-select: none;
+}
+.model-card:hover { border-color: var(--accent-mid); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.model-card.selected { border-color: var(--accent); background: var(--accent-light); box-shadow: var(--shadow-hover); }
+
+.model-check {
+  position: absolute; top: 10px; right: 10px;
+  width: 20px; height: 20px;
+  background: var(--accent); border-radius: 50%;
+  display: none; align-items: center; justify-content: center;
+}
+.model-check svg { width: 11px; height: 11px; }
+.model-card.selected .model-check { display: flex; }
+
+.model-tier {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-light); margin-bottom: 5px;
+}
+.model-name {
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600;
+  color: var(--ink); margin-bottom: 3px;
+}
+.model-tagline { font-size: 11px; color: var(--ink-mid); margin-bottom: 10px; }
+.model-cost {
+  font-size: 10px; color: var(--ink-light);
+  padding-top: 9px; border-top: 1px solid var(--border);
+}
+.model-note {
+  font-size: 12px; color: var(--ink-light);
+  text-align: center; margin-top: 6px; min-height: 18px;
+  font-style: italic;
+}
+
+.sliders-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+@media (max-width: 560px) { .sliders-grid { grid-template-columns: 1fr; } }
+
+.slider-card {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.slider-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 2px;
+}
+.slider-title { font-size: 12px; font-weight: 500; color: var(--ink-mid); max-width: 65%; }
+.slider-value {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--ink);
+}
+.slider-hint { font-size: 11px; color: var(--ink-light); margin-bottom: 12px; }
+
+/* Range slider: cross-browser robust approach */
+.range-wrap { position: relative; height: 24px; display: flex; align-items: center; }
+.range-track-bg {
+  position: absolute; left: 0; right: 0; height: 4px;
+  background: var(--border); border-radius: 4px; pointer-events: none;
+}
+.range-track-fill {
+  position: absolute; left: 0; height: 4px;
+  background: var(--accent); border-radius: 4px; pointer-events: none;
+  width: 2%;
+}
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 24px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  padding: 0; margin: 0;
+  border: none;
+  position: relative;
+  z-index: 1;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px; height: 22px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 1px 6px rgba(45,90,61,0.4);
+  cursor: pointer;
+}
+input[type=range]::-moz-range-thumb {
+  width: 22px; height: 22px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 1px 6px rgba(45,90,61,0.4);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+input[type=range]::-webkit-slider-runnable-track { background: transparent; height: 4px; }
+input[type=range]::-moz-range-track { background: transparent; height: 4px; }
+
+.results-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px; margin-bottom: 32px;
+}
+@media (max-width: 600px) { .results-strip { grid-template-columns: repeat(2, 1fr); } }
+
+.result-card {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 12px; text-align: center;
+  box-shadow: var(--shadow);
+}
+.result-label { font-size: 11px; color: var(--ink-light); margin-bottom: 5px; }
+.result-value { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: var(--ink); line-height: 1.1; }
+.result-sub { font-size: 11px; color: var(--ink-light); margin-top: 4px; }
+.result-card.hl { background: var(--accent); border-color: var(--accent); }
+.result-card.hl .result-label { color: rgba(255,255,255,0.6); }
+.result-card.hl .result-value { color: #fff; }
+.result-card.hl .result-sub { color: rgba(255,255,255,0.6); }
+
+.pricing-wrap {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 28px;
+}
+.pricing-head {
+  background: var(--ink); color: var(--paper);
+  padding: 18px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px;
+}
+.pricing-head h3 { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; }
+.pricing-head p { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.pricing-model-tag {
+  font-size: 11px; padding: 4px 12px;
+  background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8);
+  border-radius: 20px; flex-shrink: 0;
+}
+.pricing-tiers {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 560px) { .pricing-tiers { grid-template-columns: 1fr; } }
+
+.tier {
+  padding: 22px 20px;
+  border-right: 1px solid var(--border);
+}
+.tier:last-child { border-right: none; }
+@media (max-width: 560px) {
+  .tier { border-right: none; border-bottom: 1px solid var(--border); }
+  .tier:last-child { border-bottom: none; }
+}
+.tier.recommended { background: var(--gold-bg); }
+.tier-badge {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-light); margin-bottom: 6px;
+}
+.tier.recommended .tier-badge { color: var(--gold); }
+.tier-sublabel { font-size: 12px; color: var(--ink-mid); margin-bottom: 6px; }
+.tier-price {
+  font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 600;
+  color: var(--ink); line-height: 1; margin-bottom: 4px;
+}
+.tier-price span { font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 400; color: var(--ink-mid); }
+.tier-margin {
+  display: inline-block;
+  font-size: 11px; font-weight: 500; color: var(--accent-mid);
+  background: var(--accent-light);
+  padding: 3px 10px; border-radius: 20px; margin-top: 8px;
+}
+.tier.recommended .tier-margin { background: #e6f0d6; color: #3a6010; }
+.tier-desc { font-size: 12px; color: var(--ink-light); margin-top: 10px; line-height: 1.55; }
+
+.breakdown {
+  background: var(--paper-warm);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+}
+.breakdown h3 {
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600;
+  margin-bottom: 14px;
+}
+.brow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; font-size: 14px;
+  border-bottom: 1px solid rgba(26,26,24,0.09);
+}
+.brow:last-child { border-bottom: none; }
+.brow .lbl { color: var(--ink-mid); }
+.brow .val { font-weight: 500; }
+.brow.total .lbl { font-weight: 500; color: var(--ink); font-size: 15px; }
+.brow.total .val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; }
+.green { color: var(--accent); }
+.brow-hr { height: 1px; background: rgba(26,26,24,0.12); margin: 8px 0; }
+
+.token-section {
+  background: var(--ink);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+  color: var(--paper);
+}
+.token-section h3 {
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600;
+  color: var(--paper); margin-bottom: 16px;
+}
+.token-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px;
+}
+@media (max-width: 580px) { .token-grid { grid-template-columns: repeat(2, 1fr); } }
+.token-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; padding: 14px 16px;
+}
+.token-card-label { font-size: 11px; color: rgba(250,249,246,0.5); margin-bottom: 4px; letter-spacing: 0.03em; }
+.token-card-value { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--paper); line-height: 1.1; }
+.token-card-sub { font-size: 11px; color: rgba(250,249,246,0.45); margin-top: 3px; }
+.token-card.accent-in { border-color: rgba(74,138,94,0.5); background: rgba(45,90,61,0.2); }
+.token-card.accent-out { border-color: rgba(154,111,0,0.4); background: rgba(154,111,0,0.12); }
+.token-card.accent-in .token-card-value { color: #7ec99a; }
+.token-card.accent-out .token-card-value { color: #e8b84b; }
+.token-bar-wrap { margin-top: 4px; }
+.token-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: rgba(250,249,246,0.5); margin-bottom: 6px; }
+.token-bar-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+.token-bar-fill-wrap { display: flex; height: 100%; }
+.token-bar-in  { background: #4a8a5e; border-radius: 3px 0 0 3px; }
+.token-bar-out { background: #b8860b; border-radius: 0 3px 3px 0; }
+.token-legend { display: flex; gap: 16px; margin-top: 10px; }
+.token-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(250,249,246,0.55); }
+.token-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+.tips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+@media (max-width: 600px) { .tips { grid-template-columns: 1fr; } }
+.tip {
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+  box-shadow: var(--shadow);
+}
+.tip-icon { font-size: 22px; margin-bottom: 9px; }
+.tip-title { font-weight: 500; font-size: 13px; margin-bottom: 6px; }
+.tip-body { font-size: 12px; color: var(--ink-mid); line-height: 1.6; }
+
+footer {
+  background: var(--ink); color: rgba(250,249,246,0.4);
+  text-align: center; padding: 26px;
+  font-size: 12px;
+}
+footer strong { color: rgba(250,249,246,0.7); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade { animation: fadeUp 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-blob1"></div>
+  <div class="hero-blob2"></div>
+  <div class="hero-eyebrow">Strumento di analisi costi</div>
+  <h1>Quanto costa integrare<br>l'intelligenza artificiale?</h1>
+  <p>Calcola il costo reale dell'AI nella tua azienda e scopri il prezzo giusto per i tuoi servizi.</p>
+</div>
+
+<div class="container">
+
+  <div class="step-label">
+    <div class="step-num">1</div>
+    <div class="step-text">Scegli il livello di intelligenza</div>
+  </div>
+
+  <div class="model-grid" id="modelGrid"></div>
+  <p class="model-note" id="modelNote"></p>
+
+  <div class="step-label">
+    <div class="step-num">2</div>
+    <div class="step-text">Configura il tuo utilizzo</div>
+  </div>
+
+  <div class="sliders-grid">
+    <div class="slider-card">
+      <div class="slider-header">
+        <span class="slider-title">Lunghezza testo inviato</span>
+        <span class="slider-value" id="v-input">1.000</span>
+      </div>
+      <div class="slider-hint" id="h-input">≈ 750 parole — una pagina A4</div>
+      <div class="range-wrap">
+        <div class="range-track-bg"></div>
+        <div class="range-track-fill" id="f-input"></div>
+        <input type="range" id="s-input" min="100" max="50000" step="100" value="1000">
+      </div>
+    </div>
+
+    <div class="slider-card">
+      <div class="slider-header">
+        <span class="slider-title">Lunghezza risposta AI</span>
+        <span class="slider-value" id="v-output">500</span>
+      </div>
+      <div class="slider-hint" id="h-output">≈ 375 parole — risposta media</div>
+      <div class="range-wrap">
+        <div class="range-track-bg"></div>
+        <div class="range-track-fill" id="f-output"></div>
+        <input type="range" id="s-output" min="100" max="10000" step="100" value="500">
+      </div>
+    </div>
+
+    <div class="slider-card">
+      <div class="slider-header">
+        <span class="slider-title">Richieste al giorno</span>
+        <span class="slider-value" id="v-req">100</span>
+      </div>
+      <div class="slider-hint">Quante volte al giorno si usa il sistema</div>
+      <div class="range-wrap">
+        <div class="range-track-bg"></div>
+        <div class="range-track-fill" id="f-req"></div>
+        <input type="range" id="s-req" min="10" max="10000" step="10" value="100">
+      </div>
+    </div>
+
+    <div class="slider-card">
+      <div class="slider-header">
+        <span class="slider-title">Numero clienti / utenti</span>
+        <span class="slider-value" id="v-clients">10</span>
+      </div>
+      <div class="slider-hint">Distribuisce il costo totale</div>
+      <div class="range-wrap">
+        <div class="range-track-bg"></div>
+        <div class="range-track-fill" id="f-clients"></div>
+        <input type="range" id="s-clients" min="1" max="500" step="1" value="10">
+      </div>
+    </div>
+  </div>
+
+  <div class="step-label">
+    <div class="step-num">3</div>
+    <div class="step-text">I tuoi costi reali</div>
+  </div>
+
+  <div class="results-strip" id="resultsStrip">
+    <div class="result-card"><div class="result-label">Costo al giorno</div><div class="result-value" id="r-day">—</div><div class="result-sub" id="r-day-sub"></div></div>
+    <div class="result-card"><div class="result-label">Costo API / mese</div><div class="result-value" id="r-api">—</div><div class="result-sub">solo licenza API</div></div>
+    <div class="result-card"><div class="result-label">Costo totale / mese</div><div class="result-value" id="r-total">—</div><div class="result-sub">API + infrastruttura</div></div>
+    <div class="result-card hl"><div class="result-label">Costo per cliente</div><div class="result-value" id="r-client">—</div><div class="result-sub">al mese, tutto incluso</div></div>
+  </div>
+
+  <!-- TOKEN USAGE SECTION -->
+  <div class="token-section" id="tokenSection">
+    <h3>Token consumati</h3>
+    <div class="token-grid">
+      <div class="token-card">
+        <div class="token-card-label">Token per richiesta</div>
+        <div class="token-card-value" id="t-per-req">—</div>
+        <div class="token-card-sub" id="t-per-req-sub">input + output</div>
+      </div>
+      <div class="token-card accent-in">
+        <div class="token-card-label">Token input / mese</div>
+        <div class="token-card-value" id="t-in-month">—</div>
+        <div class="token-card-sub" id="t-in-mtok">— milioni</div>
+      </div>
+      <div class="token-card accent-out">
+        <div class="token-card-label">Token output / mese</div>
+        <div class="token-card-value" id="t-out-month">—</div>
+        <div class="token-card-sub" id="t-out-mtok">— milioni</div>
+      </div>
+      <div class="token-card">
+        <div class="token-card-label">Token totali / giorno</div>
+        <div class="token-card-value" id="t-day-total">—</div>
+        <div class="token-card-sub">tutte le richieste</div>
+      </div>
+      <div class="token-card">
+        <div class="token-card-label">Token totali / mese</div>
+        <div class="token-card-value" id="t-month-total">—</div>
+        <div class="token-card-sub" id="t-month-mtok">— milioni</div>
+      </div>
+      <div class="token-card">
+        <div class="token-card-label">Token per cliente / mese</div>
+        <div class="token-card-value" id="t-client-month">—</div>
+        <div class="token-card-sub">quota individuale</div>
+      </div>
+    </div>
+    <div class="token-bar-wrap">
+      <div class="token-bar-label">
+        <span>Composizione token per richiesta</span>
+        <span id="t-bar-pct">—</span>
+      </div>
+      <div class="token-bar-track">
+        <div class="token-bar-fill-wrap">
+          <div class="token-bar-in"  id="t-bar-in"  style="width:66%"></div>
+          <div class="token-bar-out" id="t-bar-out" style="width:34%"></div>
+        </div>
+      </div>
+      <div class="token-legend">
+        <div class="token-legend-item"><div class="token-legend-dot" style="background:#4a8a5e"></div><span id="t-leg-in">Input —</span></div>
+        <div class="token-legend-item"><div class="token-legend-dot" style="background:#b8860b"></div><span id="t-leg-out">Output —</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-label">
+    <div class="step-num">4</div>
+    <div class="step-text">Quanto far pagare ai clienti</div>
+  </div>
+
+  <div class="pricing-wrap">
+    <div class="pricing-head">
+      <div>
+        <h3>Prezzi consigliati per cliente</h3>
+        <p>Basati sul costo API reale + infrastruttura + margine</p>
+      </div>
+      <div class="pricing-model-tag" id="pricingModelTag">Sonnet 4.6</div>
+    </div>
+    <div class="pricing-tiers" id="pricingTiers"></div>
+  </div>
+
+  <div class="breakdown" id="breakdownBox"></div>
+
+  <div class="step-label" style="margin-top: 12px;">
+    <div class="step-num">5</div>
+    <div class="step-text">Come ridurre i costi</div>
+  </div>
+
+  <div class="tips">
+    <div class="tip">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-title">Batch API — risparmio 50%</div>
+      <div class="tip-body">Se le richieste non devono essere in tempo reale, puoi usare la modalità batch e dimezzare il costo API. Ideale per elaborazioni notturne o report automatici.</div>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💾</div>
+      <div class="tip-title">Prompt Caching — risparmio 40-90%</div>
+      <div class="tip-body">Se le istruzioni iniziali restano uguali tra una richiesta e l'altra, il sistema le memorizza. Si paga solo la differenza. Ottimo per chatbot e assistenti fissi.</div>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">📊</div>
+      <div class="tip-title">Scegli il modello giusto</div>
+      <div class="tip-body">Non tutte le attività richiedono il massimo della potenza. Un modello economico per task semplici (FAQ, riassunti brevi) può ridurre i costi dell'80%.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Powered by Claude API — Anthropic</strong><br>
+  Prezzi in USD convertiti con cambio indicativo €0,92 per $1 · Aggiornato marzo 2026
+</footer>
+
+<script>
+var MODELS = [
+  { id:'haiku3',   tier:'Economico',  name:'Haiku 3',    input:0.25, output:1.25, tagline:'Task semplici e veloci',    note:'Ideale per FAQ, classificazioni, risposte brevi. Il più economico disponibile.' },
+  { id:'haiku45',  tier:'Economico+', name:'Haiku 4.5',  input:1,    output:5,    tagline:'Veloce e capace',           note:'Ottimo equilibrio velocità/qualità per assistenti leggeri e automazioni.' },
+  { id:'sonnet46', tier:'Bilanciato', name:'Sonnet 4.6', input:3,    output:15,   tagline:'Il più usato in produzione',note:'Il modello di riferimento: analisi, scrittura, supporto avanzato.' },
+  { id:'opus46',   tier:'Premium',    name:'Opus 4.6',   input:5,    output:25,   tagline:'Massima intelligenza',      note:'Per compiti complessi: strategia, legale, finanziario. Il più potente.' }
+];
+var USD_EUR = 0.92;
+var selected = MODELS[2];
+
+function fmtN(n) {
+  return Math.round(n).toLocaleString('it-IT');
+}
+
+function fmtEur(n) {
+  if (n < 0.005) return '€0,00';
+  if (n < 1)    return '€' + n.toFixed(2).replace('.',',');
+  if (n < 10)   return '€' + n.toFixed(2).replace('.',',');
+  if (n < 100)  return '€' + n.toFixed(1).replace('.',',');
+  if (n < 1000) return '€' + Math.round(n).toLocaleString('it-IT');
+  return '€' + (n/1000).toFixed(1).replace('.',',') + 'k';
+}
+
+function roundPrice(p) {
+  if (p < 5)   return Math.max(1, Math.ceil(p));
+  if (p < 20)  return Math.ceil(p / 5) * 5;
+  if (p < 100) return Math.ceil(p / 10) * 10;
+  if (p < 500) return Math.ceil(p / 25) * 25;
+  return Math.ceil(p / 50) * 50;
+}
+
+function wordsHint(tok) {
+  var w = Math.round(tok * 0.75);
+  if (w < 200)  return '\u2248 ' + fmtN(w) + ' parole \u2014 messaggio breve';
+  if (w < 750)  return '\u2248 ' + fmtN(w) + ' parole \u2014 risposta media';
+  if (w < 2000) return '\u2248 ' + fmtN(w) + ' parole \u2014 testo lungo';
+  return '\u2248 ' + fmtN(w) + ' parole \u2014 documento completo';
+}
+
+function fillSlider(inputId, fillId) {
+  var el = document.getElementById(inputId);
+  var fill = document.getElementById(fillId);
+  if (!el || !fill) return;
+  var min = parseFloat(el.min);
+  var max = parseFloat(el.max);
+  var val = parseFloat(el.value);
+  var pct = ((val - min) / (max - min)) * 100;
+  fill.style.width = pct.toFixed(1) + '%';
+}
+
+function renderModels() {
+  var g = document.getElementById('modelGrid');
+  var html = '';
+  for (var i = 0; i < MODELS.length; i++) {
+    var m = MODELS[i];
+    var isSel = m.id === selected.id;
+    html += '<div class="model-card' + (isSel ? ' selected' : '') + '" onclick="selectModel(\'' + m.id + '\')">';
+    html += '<div class="model-check"><svg viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    html += '<div class="model-tier">' + m.tier + '</div>';
+    html += '<div class="model-name">' + m.name + '</div>';
+    html += '<div class="model-tagline">' + m.tagline + '</div>';
+    html += '<div class="model-cost">Input $' + m.input + ' &middot; Output $' + m.output + ' per M token</div>';
+    html += '</div>';
+  }
+  g.innerHTML = html;
+  document.getElementById('modelNote').textContent = selected.note;
+  document.getElementById('pricingModelTag').textContent = selected.name;
+}
+
+function selectModel(id) {
+  for (var i = 0; i < MODELS.length; i++) {
+    if (MODELS[i].id === id) { selected = MODELS[i]; break; }
+  }
+  renderModels();
+  update();
+}
+
+function update() {
+  var inputTok  = parseFloat(document.getElementById('s-input').value)   || 1000;
+  var outputTok = parseFloat(document.getElementById('s-output').value)  || 500;
+  var reqDay    = parseFloat(document.getElementById('s-req').value)      || 100;
+  var clients   = parseFloat(document.getElementById('s-clients').value) || 10;
+
+  fillSlider('s-input',   'f-input');
+  fillSlider('s-output',  'f-output');
+  fillSlider('s-req',     'f-req');
+  fillSlider('s-clients', 'f-clients');
+
+  document.getElementById('v-input').textContent   = fmtN(inputTok);
+  document.getElementById('v-output').textContent  = fmtN(outputTok);
+  document.getElementById('v-req').textContent     = fmtN(reqDay);
+  document.getElementById('v-clients').textContent = fmtN(clients);
+  document.getElementById('h-input').textContent   = wordsHint(inputTok);
+  document.getElementById('h-output').textContent  = wordsHint(outputTok);
+
+  /* CALCOLI */
+  var inMtok  = (reqDay * inputTok)  / 1000000;
+  var outMtok = (reqDay * outputTok) / 1000000;
+  var costDayUsd   = inMtok * selected.input + outMtok * selected.output;
+  var costMonthUsd = costDayUsd * 30;
+  var costMonthEur = costMonthUsd * USD_EUR;
+  var infra        = costMonthEur * 0.20;
+  var support      = Math.max(costMonthEur * 0.15, 15);
+  var totalMonth   = costMonthEur + infra + support;
+  var perClient    = totalMonth / clients;
+
+  /* TOKEN CALCULATIONS */
+  var tokPerReq   = inputTok + outputTok;
+  var tokDayTotal = tokPerReq * reqDay;
+  var tokMonTotal = tokDayTotal * 30;
+  var tokInMonth  = inputTok  * reqDay * 30;
+  var tokOutMonth = outputTok * reqDay * 30;
+  var tokPerClient = tokMonTotal / clients;
+  var inPct  = Math.round(inputTok  / tokPerReq * 100);
+  var outPct = 100 - inPct;
+
+  function fmtTok(n) {
+    if (n >= 1000000000) return (n/1000000000).toFixed(1).replace('.',',') + ' Md';
+    if (n >= 1000000)    return (n/1000000).toFixed(2).replace('.',',') + 'M';
+    if (n >= 1000)       return (n/1000).toFixed(1).replace('.',',') + 'k';
+    return Math.round(n).toLocaleString('it-IT');
+  }
+  function fmtMtok(n) {
+    var m = n / 1000000;
+    if (m >= 1000) return (m/1000).toFixed(2).replace('.',',') + ' miliardi';
+    if (m >= 1)    return m.toFixed(2).replace('.',',') + ' milioni';
+    return (m * 1000).toFixed(1).replace('.',',') + ' mila';
+  }
+
+  document.getElementById('t-per-req').textContent    = fmtTok(tokPerReq);
+  document.getElementById('t-per-req-sub').textContent = fmtTok(inputTok) + ' input + ' + fmtTok(outputTok) + ' output';
+  document.getElementById('t-in-month').textContent   = fmtTok(tokInMonth);
+  document.getElementById('t-in-mtok').textContent    = fmtMtok(tokInMonth);
+  document.getElementById('t-out-month').textContent  = fmtTok(tokOutMonth);
+  document.getElementById('t-out-mtok').textContent   = fmtMtok(tokOutMonth);
+  document.getElementById('t-day-total').textContent  = fmtTok(tokDayTotal);
+  document.getElementById('t-month-total').textContent = fmtTok(tokMonTotal);
+  document.getElementById('t-month-mtok').textContent  = fmtMtok(tokMonTotal);
+  document.getElementById('t-client-month').textContent = fmtTok(tokPerClient);
+
+  document.getElementById('t-bar-in').style.width    = inPct + '%';
+  document.getElementById('t-bar-out').style.width   = outPct + '%';
+  document.getElementById('t-bar-pct').textContent   = inPct + '% input / ' + outPct + '% output';
+  document.getElementById('t-leg-in').textContent    = 'Input — ' + fmtTok(inputTok) + ' tok/richiesta';
+  document.getElementById('t-leg-out').textContent   = 'Output — ' + fmtTok(outputTok) + ' tok/richiesta';
+
+  /* RESULTS */
+  document.getElementById('r-day').textContent     = fmtEur(costDayUsd * USD_EUR);
+  document.getElementById('r-day-sub').textContent = fmtN(reqDay) + ' richieste';
+  document.getElementById('r-api').textContent     = fmtEur(costMonthEur);
+  document.getElementById('r-total').textContent   = fmtEur(totalMonth);
+  document.getElementById('r-client').textContent  = fmtEur(perClient);
+
+  /* PRICING TIERS */
+  var r1 = roundPrice(perClient * 2);
+  var r2 = roundPrice(perClient * 3);
+  var r3 = roundPrice(perClient * 5);
+  function mg(p) { return Math.round((p - perClient) / p * 100); }
+
+  document.getElementById('pricingTiers').innerHTML =
+    '<div class="tier">' +
+      '<div class="tier-badge">Base &middot; 2&times; costi</div>' +
+      '<div class="tier-sublabel">Prezzo minimo sostenibile</div>' +
+      '<div class="tier-price">&euro;' + r1 + '<span>/mese</span></div>' +
+      '<div class="tier-margin">Margine ~' + mg(r1) + '%</div>' +
+      '<div class="tier-desc">Adatto per clienti di prova o volumi molto alti. Nessun buffer per imprevisti.</div>' +
+    '</div>' +
+    '<div class="tier recommended">' +
+      '<div class="tier-badge">\u2605 Consigliato &middot; 3&times; costi</div>' +
+      '<div class="tier-sublabel">Prezzo di mercato ideale</div>' +
+      '<div class="tier-price">&euro;' + r2 + '<span>/mese</span></div>' +
+      '<div class="tier-margin">Margine ~' + mg(r2) + '%</div>' +
+      '<div class="tier-desc">Copre infrastruttura, supporto e crescita. Il punto di partenza per la maggior parte dei servizi.</div>' +
+    '</div>' +
+    '<div class="tier">' +
+      '<div class="tier-badge">Premium &middot; 5&times; costi</div>' +
+      '<div class="tier-sublabel">Servizio managed ad alto valore</div>' +
+      '<div class="tier-price">&euro;' + r3 + '<span>/mese</span></div>' +
+      '<div class="tier-margin">Margine ~' + mg(r3) + '%</div>' +
+      '<div class="tier-desc">Quando offri consulenza dedicata e personalizzazione. Giustificato con un\'offerta solida.</div>' +
+    '</div>';
+
+  /* BREAKDOWN */
+  var saving50 = costMonthEur * 0.50;
+  var saving40 = costMonthEur * 0.40;
+  var nCl = Math.round(clients);
+  document.getElementById('breakdownBox').innerHTML =
+    '<h3>Composizione del costo mensile (' + nCl + ' ' + (nCl === 1 ? 'cliente' : 'clienti') + ')</h3>' +
+    '<div class="brow"><span class="lbl">Costo API Claude &mdash; ' + selected.name + '</span><span class="val">' + fmtEur(costMonthEur) + '</span></div>' +
+    '<div class="brow"><span class="lbl">Infrastruttura stimata (20%)</span><span class="val">' + fmtEur(infra) + '</span></div>' +
+    '<div class="brow"><span class="lbl">Supporto e manutenzione</span><span class="val">' + fmtEur(support) + '</span></div>' +
+    '<div class="brow total"><span class="lbl">Totale costi mensili</span><span class="val">' + fmtEur(totalMonth) + '</span></div>' +
+    '<div class="brow-hr"></div>' +
+    '<div class="brow"><span class="lbl">Con Batch API (&minus;50% sul costo API)</span><span class="val green">risparmio ' + fmtEur(saving50) + '/mese</span></div>' +
+    '<div class="brow"><span class="lbl">Con Prompt Caching (&minus;40% stimato)</span><span class="val green">risparmio ' + fmtEur(saving40) + '/mese</span></div>';
+}
+
+/* EVENTS */
+var sliders = ['s-input','s-output','s-req','s-clients'];
+for (var k = 0; k < sliders.length; k++) {
+  document.getElementById(sliders[k]).addEventListener('input', update);
+}
+
+/* INIT */
+renderModels();
+update();
+</script>
+</body>
+</html>
