@@ -49,8 +49,25 @@
       "isText": false,
       "ghPath": "files/plugin AI agent",
       "mimeType": ""
+    },
+    {
+      "id": 6,
+      "name": "Calcolatore Token API KEY",
+      "description": "Calcola i costi dei token per claude",
+      "category": "HTML / Template",
+      "version": "v1.0",
+      "tags": [
+        "Claude",
+        "Calcolo token"
+      ],
+      "date": "15/03/2026",
+      "filename": "calcolatore costi API Key AI v2",
+      "size": 31547,
+      "isText": false,
+      "ghPath": "files/calcolatore costi API Key AI v2",
+      "mimeType": ""
     }
   ],
   "project": null,
-  "updatedAt": "2026-03-15T00:31:42.681Z"
+  "updatedAt": "2026-03-15T00:32:52.108Z"
 }
