@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">
+      <h1>Skill Dashboard</h1>
+      <p>Il tuo centro operativo</p>
+    </div>
+  </div>
+  <div class="sync-bar">
+    <div class="sync-status disconnected" id="sync-status" onclick="openTokenModal()" title="Connetti GitHub">
+      <span class="sync-dot red" id="sync-dot"></span>
+      <span id="sync-label">GitHub</span>
+    </div>
+    <div class="badge" id="header-badge">0 Skill</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('skills',this)">🗂 Le Mie Skill <span class="tab-count" id="tc-skills">0</span></button>
+  <button class="tab" onclick="showTab('roadmap',this)">🗺 Roadmap <span class="tab-count">6</span></button>
+  <button class="tab" onclick="showTab('project',this)" id="tab-project">📋 Progetto Attivo</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SKILLS -->
+  <div id="section-skills" class="section-visible animate-in">
+    <div class="top-bar">
+      <input type="text" class="search-bar" placeholder="🔍  Cerca skill..." oninput="filterSkills(this.value)" id="search">
+      <button class="add-btn" onclick="openModal()">
+        <span>＋</span><span class="add-label">Aggiungi Skill</span>
+      </button>
+    </div>
+    <div class="skills-layout">
+      <div class="skills-list" id="skills-list"></div>
+      <div id="skill-detail"></div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div id="section-roadmap" class="section-hidden">
+    <div class="roadmap-header">
+      <span style="font-size:24px">🗺</span>
+      <div>
+        <h2>Processo Operativo — Web Project</h2>
+        <p>Dal brief alla consegna: le 6 fasi del tuo workflow</p>
+      </div>
+    </div>
+    <div class="pipeline-top" id="pipeline-top">
+      <div class="pipeline">
+        <h4>⚡ Pipeline Completa</h4>
+        <div class="pipeline-track" id="pipeline-track-top"></div>
+        <div class="pipeline-labels"><span>Inizio</span><span>Consegna</span></div>
+      </div>
+    </div>
+    <div class="roadmap-layout">
+      <div class="roadmap-grid" id="roadmap-grid"></div>
+      <div id="roadmap-detail"></div>
+    </div>
+  </div>
+
+  <!-- PROGETTO -->
+  <div id="section-project" class="section-hidden">
+    <div id="project-content"></div>
+  </div>
+
+</div>
+
+<!-- MODAL ADD SKILL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>➕ Aggiungi Skill</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Nome Skill *</label>
+        <input type="text" id="f-name" placeholder="es. SEO Audit v1">
+      </div>
+      <div class="field">
+        <label>Descrizione</label>
+        <input type="text" id="f-desc" placeholder="Breve descrizione dello scopo">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field">
+          <label>Categoria</label>
+          <select id="f-cat">
+            <option>Copywriting</option>
+            <option>Project Management</option>
+            <option>Development</option>
+            <option>Design</option>
+            <option>SEO</option>
+            <option>HTML / Template</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Versione</label>
+          <input type="text" id="f-ver" placeholder="v1.0" value="v1.0">
+        </div>
+      </div>
+      <div class="field">
+        <label>Tag</label>
+        <div class="tags-input-wrap">
+          <input type="text" id="f-tag-input" placeholder="es. SEO" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}">
+          <button onclick="addTag()">+ Tag</button>
+        </div>
+        <div class="tags-preview" id="tags-preview"></div>
+      </div>
+      <div class="field">
+        <label>Carica File
+          <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;font-size:9px">
+            — .html .txt .md .zip .pdf .json e altri
+          </span>
+        </label>
+        <div class="drop-zone" id="drop-zone"
+          ondragover="event.preventDefault();this.classList.add('dragging')"
+          ondragleave="this.classList.remove('dragging')"
+          ondrop="handleDrop(event)"
+          onclick="document.getElementById('file-input').click()">
+          <div class="dz-icon">📂</div>
+          <p id="dz-text">Trascina qui il file o clicca per selezionarlo</p>
+          <div class="dz-types">.html (anteprima live) • .txt .md .zip .pdf .json e altri</div>
+        </div>
+        <input type="file" id="file-input" style="display:none" onchange="handleFileInput(this)" accept="*/*">
+        <div class="upload-progress" id="upload-progress">
+          <div class="upload-progress-bar"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Oppure scrivi il contenuto direttamente</label>
+        <textarea id="f-content" placeholder="Incolla o scrivi qui il contenuto della skill..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Annulla</button>
+      <button class="btn-save" id="btn-save" onclick="saveSkill()">💾 Salva Skill</button>
+    </div>
+  </div>
+</div>
+
+<!-- GITHUB TOKEN MODAL -->
+<div class="modal-overlay" id="token-modal-overlay" onclick="handleTokenOverlay(event)">
+  <div class="token-modal">
+    <div class="modal-header">
+      <h2>⚙ GitHub Sync</h2>
+      <button class="close-btn" onclick="closeTokenModal()">✕</button>
+    </div>
+    <div id="token-modal-body"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
