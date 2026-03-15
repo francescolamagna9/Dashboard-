@@ -1,0 +1,38 @@
+{
+  "skills": [
+    {
+      "id": 1,
+      "name": "Web Copywriter v2",
+      "filename": "web-copywriter-v2_skill.txt",
+      "category": "Copywriting",
+      "description": "Skill per la creazione di copy professionale per siti web, ottimizzato per conversioni e SEO.",
+      "tags": [
+        "Copy",
+        "SEO",
+        "Web"
+      ],
+      "date": "10/03/2025",
+      "version": "v2.0",
+      "isText": true,
+      "content": "# WEB COPYWRITER v2 — SKILL\n\n## DESCRIZIONE\nSkill avanzata per la creazione di copy web professionale.\n\n## OBIETTIVO\nCreare testi che convertono, rispettando il tono del brand e ottimizzando per SEO.\n\n## QUANDO USARLA\n- Dopo aver definito la struttura del sito\n- Quando il layout e le sezioni sono già impostate\n\n## PROCESSO\n1. Analizza il brief e il tone of voice\n2. Identifica le keyword target\n3. Struttura headline → body → CTA\n4. Scrivi in modo persuasivo\n5. Ottimizza per SEO\n6. Revisiona per coerenza\n\n## OUTPUT ATTESO\n- Headline principale\n- Sottotitoli sezione\n- Body copy\n- CTA orientati alla conversione\n- Meta title e description"
+    },
+    {
+      "id": 2,
+      "name": "Project Bible v2",
+      "filename": "project-bible-v2_skill.txt",
+      "category": "Project Management",
+      "description": "Skill per la strutturazione del brief e della documentazione di progetto per siti web.",
+      "tags": [
+        "Brief",
+        "Documentazione",
+        "Struttura"
+      ],
+      "date": "12/03/2025",
+      "version": "v2.0",
+      "isText": true,
+      "content": "# PROJECT BIBLE v2 — SKILL\n\n## DESCRIZIONE\nSkill per creare il documento di progetto completo partendo dal materiale grezzo.\n\n## OBIETTIVO\nTrasformare il materiale dell'account manager in un brief operativo chiaro.\n\n## QUANDO USARLA\n- Appena ricevuto il file TXT\n- Prima di iniziare qualsiasi lavoro sul sito\n\n## PROCESSO\n1. Analizza tutto il materiale\n2. Identifica obiettivo principale\n3. Definisci target audience\n4. Mappa la struttura sito\n5. Assegna keyword per pagina\n6. Documenta brand identity\n7. Raccogli referenze e competitor\n8. Definisci timeline\n\n## OUTPUT ATTESO\n- Struttura sito con gerarchia\n- Keyword map\n- Brand guidelines\n- Lista materiali\n- Timeline"
+    }
+  ],
+  "project": null,
+  "updatedAt": "2026-03-15T00:18:55.118Z"
+}
