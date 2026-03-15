@@ -31,8 +31,26 @@
       "version": "v2.0",
       "isText": true,
       "content": "# PROJECT BIBLE v2 ÃÂ¢ÃÂÃÂ SKILL\n\n## DESCRIZIONE\nSkill per creare il documento di progetto completo partendo dal materiale grezzo.\n\n## OBIETTIVO\nTrasformare il materiale dell'account manager in un brief operativo chiaro.\n\n## QUANDO USARLA\n- Appena ricevuto il file TXT\n- Prima di iniziare qualsiasi lavoro sul sito\n\n## PROCESSO\n1. Analizza tutto il materiale\n2. Identifica obiettivo principale\n3. Definisci target audience\n4. Mappa la struttura sito\n5. Assegna keyword per pagina\n6. Documenta brand identity\n7. Raccogli referenze e competitor\n8. Definisci timeline\n\n## OUTPUT ATTESO\n- Struttura sito con gerarchia\n- Keyword map\n- Brand guidelines\n- Lista materiali\n- Timeline"
+    },
+    {
+      "id": 5,
+      "name": "Plugin AI Agent",
+      "description": "Per WordPress e woocommerce",
+      "category": "Altro",
+      "version": "v1.0",
+      "tags": [
+        "Plugin",
+        "WordPress",
+        "Woocommerce"
+      ],
+      "date": "15/03/2026",
+      "filename": "plugin AI agent",
+      "size": 58920,
+      "isText": false,
+      "ghPath": "files/plugin AI agent",
+      "mimeType": ""
     }
   ],
   "project": null,
-  "updatedAt": "2026-03-15T00:30:42.251Z"
+  "updatedAt": "2026-03-15T00:31:42.681Z"
 }
